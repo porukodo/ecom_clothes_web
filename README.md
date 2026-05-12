@@ -111,4 +111,4 @@ Then access:
 
 ## Author
 
-Developed by **Phat Bui** as a university course project.
+Developed by **porokodo** (Phat Bui) as a university course project.

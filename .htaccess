@@ -1,0 +1,4 @@
+# Deny web access to secrets and env files (Apache)
+<FilesMatch "^(\.env|\.env\..*)$">
+    Require all denied
+</FilesMatch>

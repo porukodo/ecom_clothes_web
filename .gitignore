@@ -4,6 +4,8 @@
 # XAMPP / PHP
 /vendor/
 .env
+.env.generated
+*.pem
 
 # Logs
 *.log

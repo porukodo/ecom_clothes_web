@@ -225,12 +225,12 @@ DROP TABLE IF EXISTS `dia_chi`;
 CREATE TABLE `dia_chi` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `nguoi_dung_id` bigint(20) UNSIGNED NOT NULL,
-  `ten_nguoi_nhan` varchar(100) NOT NULL,
-  `so_dien_thoai` varchar(20) NOT NULL,
-  `tinh_thanh` varchar(100) NOT NULL,
-  `quan_huyen` varchar(100) NOT NULL,
-  `phuong_xa` varchar(100) NOT NULL,
-  `dia_chi_cu_the` text NOT NULL,
+  `ten_nguoi_nhan` text NOT NULL COMMENT 'V2: AES-encrypted PII',
+  `so_dien_thoai` text NOT NULL COMMENT 'V2: AES-encrypted PII',
+  `tinh_thanh` text NOT NULL COMMENT 'V2: AES-encrypted PII',
+  `quan_huyen` text NOT NULL COMMENT 'V2: AES-encrypted PII',
+  `phuong_xa` text NOT NULL COMMENT 'V2: AES-encrypted PII',
+  `dia_chi_cu_the` text NOT NULL COMMENT 'V2: AES-encrypted PII',
   `mac_dinh` tinyint(1) DEFAULT 0,
   `ngay_tao` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -432,11 +432,11 @@ INSERT INTO `mau_sac` (`id`, `ten_mau`, `ma_mau`, `duong_dan`, `trang_thai`) VAL
 DROP TABLE IF EXISTS `nguoi_dung`;
 CREATE TABLE `nguoi_dung` (
   `id` bigint(20) UNSIGNED NOT NULL,
-  `email` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL COMMENT 'Plaintext for login lookup',
   `mat_khau_bam` varchar(255) NOT NULL,
-  `ho_ten` varchar(255) DEFAULT NULL,
-  `ngay_sinh` date DEFAULT NULL,
-  `so_dien_thoai` varchar(50) DEFAULT NULL,
+  `ho_ten` text DEFAULT NULL COMMENT 'V2: AES-encrypted PII',
+  `ngay_sinh` text DEFAULT NULL COMMENT 'V2: AES-encrypted PII (Y-m-d)',
+  `so_dien_thoai` text DEFAULT NULL COMMENT 'V2: AES-encrypted PII',
   `vai_tro` enum('NGUOI_DUNG','QUAN_TRI') NOT NULL DEFAULT 'NGUOI_DUNG',
   `trang_thai` enum('HOAT_DONG','KHOA','NGUNG_HOAT_DONG') NOT NULL DEFAULT 'HOAT_DONG',
   `lan_dang_nhap_gan_nhat` datetime DEFAULT NULL,

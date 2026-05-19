@@ -115,10 +115,7 @@ class AuthController {
         $id = (int)($_SESSION['nguoi_dung_id'] ?? 0);
         if ($id <= 0) { json(['ok' => false, 'authenticated' => false], 200); return; }
 
-        $pdo = Database::pdo();
-        $stm = $pdo->prepare("SELECT id, email, ho_ten, vai_tro, trang_thai, ngay_sinh, so_dien_thoai FROM nguoi_dung WHERE id = :id LIMIT 1");
-        $stm->execute(['id' => $id]);
-        $u = $stm->fetch();
+        $u = User::layHoSoCongKhai($id);
         
         if (!$u) { json(['ok' => false, 'authenticated' => false], 200); return; }
 

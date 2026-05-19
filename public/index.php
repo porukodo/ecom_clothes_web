@@ -41,6 +41,7 @@ session_set_cookie_params([
 
 session_start();
 
+require __DIR__ . '/../app/bootstrap.php';
 require __DIR__ . '/../app/Database.php';
 
 header('Content-Type: application/json; charset=utf-8');

@@ -1,5 +1,7 @@
 <?php
 require_once __DIR__ . '/../Database.php';
+require_once __DIR__ . '/../security/EncryptionService.php';
+require_once __DIR__ . '/../security/PiiFields.php';
 
 class User {
   // Hàm validation chung
@@ -58,12 +60,28 @@ class User {
     return $errors; // Mảng rỗng = hợp lệ
   }
 
+  private static function decryptRow(?array $row): ?array
+  {
+    if ($row === null) {
+      return null;
+    }
+    return EncryptionService::decryptFields($row, PiiFields::USER);
+  }
+
+  private static function encryptValue(?string $value): ?string
+  {
+    if ($value === null || $value === '') {
+      return $value;
+    }
+    return EncryptionService::encrypt($value);
+  }
+
   public static function timTheoEmail(string $email): ?array {
     $pdo = Database::pdo();
     $stm = $pdo->prepare("SELECT * FROM nguoi_dung WHERE email = :email LIMIT 1");
     $stm->execute(['email' => $email]);
     $row = $stm->fetch();
-    return $row ?: null;
+    return self::decryptRow($row ?: null);
   }
 
     public static function taoMoi(array $data): int {
@@ -81,9 +99,9 @@ class User {
       $stm->execute([
         'email' => $data['email'],
         'mat_khau_bam' => $data['mat_khau_bam'],
-        'ho_ten' => $data['ho_ten'] ?? null,
-        'ngay_sinh' => $data['ngay_sinh'] ?? null,
-        'so_dien_thoai' => $data['so_dien_thoai'] ?? null,
+        'ho_ten' => self::encryptValue($data['ho_ten'] ?? null),
+        'ngay_sinh' => self::encryptValue($data['ngay_sinh'] ?? null),
+        'so_dien_thoai' => self::encryptValue($data['so_dien_thoai'] ?? null),
         'vai_tro' => $data['vai_tro'] ?? 'NGUOI_DUNG',
         'trang_thai' => $data['trang_thai'] ?? 'HOAT_DONG',
       ]);
@@ -113,9 +131,9 @@ class User {
               
       $stmt = $pdo->prepare($sql);
       return $stmt->execute([
-        'ho_ten' => $data['ho_ten'],
-        'ngay_sinh' => $data['ngay_sinh'] ?: null,
-        'so_dien_thoai' => $data['so_dien_thoai'],
+        'ho_ten' => self::encryptValue($data['ho_ten']),
+        'ngay_sinh' => self::encryptValue($data['ngay_sinh'] ?: null),
+        'so_dien_thoai' => self::encryptValue($data['so_dien_thoai']),
         'id' => $id
       ]);
   }
@@ -126,7 +144,19 @@ class User {
         $stm = $pdo->prepare("SELECT * FROM nguoi_dung WHERE id = :id LIMIT 1");
         $stm->execute(['id' => $id]);
         $row = $stm->fetch();
-        return $row ?: null;
+        return self::decryptRow($row ?: null);
+    }
+
+    /** Public profile fields for API (decrypted PII, email plaintext). */
+    public static function layHoSoCongKhai(int $id): ?array {
+        $pdo = Database::pdo();
+        $stm = $pdo->prepare("
+            SELECT id, email, ho_ten, vai_tro, trang_thai, ngay_sinh, so_dien_thoai
+            FROM nguoi_dung WHERE id = :id LIMIT 1
+        ");
+        $stm->execute(['id' => $id]);
+        $row = $stm->fetch();
+        return self::decryptRow($row ?: null);
     }
 
     // Cập nhật mật khẩu mới

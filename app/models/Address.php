@@ -1,16 +1,36 @@
 <?php
 require_once __DIR__ . '/../Database.php';
+require_once __DIR__ . '/../security/EncryptionService.php';
+require_once __DIR__ . '/../security/PiiFields.php';
 
 class Address {
+    private static function decryptRow(array $row): array
+    {
+        return EncryptionService::decryptFields($row, PiiFields::ADDRESS);
+    }
+
+    /** @param array<string, mixed> $data */
+    private static function encryptAddressData(array $data): array
+    {
+        foreach (PiiFields::ADDRESS as $field) {
+            if (isset($data[$field]) && $data[$field] !== '') {
+                $data[$field] = EncryptionService::encrypt((string)$data[$field]);
+            }
+        }
+        return $data;
+    }
+
     public static function layTheoUser(int $userId): array {
         $pdo = Database::pdo();
         $stm = $pdo->prepare("SELECT * FROM dia_chi WHERE nguoi_dung_id = :uid ORDER BY mac_dinh DESC, id DESC");
         $stm->execute(['uid' => $userId]);
-        return $stm->fetchAll(PDO::FETCH_ASSOC);
+        $rows = $stm->fetchAll(PDO::FETCH_ASSOC);
+        return array_map(fn($row) => self::decryptRow($row), $rows);
     }
 
     public static function taoMoi(int $userId, array $data): bool {
         $pdo = Database::pdo();
+        $data = self::encryptAddressData($data);
         
         // Nếu địa chỉ mới là mặc định, bỏ mặc định các địa chỉ cũ
         if (!empty($data['mac_dinh'])) {
@@ -44,6 +64,7 @@ class Address {
     // BỔ SUNG: Hàm cập nhật địa chỉ
     public static function capNhat(int $id, int $userId, array $data): bool {
         $pdo = Database::pdo();
+        $data = self::encryptAddressData($data);
 
         // Nếu set mặc định, bỏ mặc định các cái khác trước
         if (!empty($data['mac_dinh'])) {
@@ -62,9 +83,6 @@ class Address {
                 WHERE id = :id AND nguoi_dung_id = :uid";
 
         $stm = $pdo->prepare($sql);
-        
-        // Nếu địa chỉ này ko set mặc định, nhưng trước đó nó là mặc định thì logic DB sẽ tự giữ
-        // Ở đây ta update thẳng theo dữ liệu gửi lên.
         
         return $stm->execute([
             'id'     => $id,

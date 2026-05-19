@@ -1,6 +1,8 @@
 <?php
 require_once 'includes/db.php';
 require_once 'includes/functions.php';
+require_once dirname(__DIR__) . '/app/security/EncryptionService.php';
+require_once dirname(__DIR__) . '/app/security/PiiFields.php';
 session_start();
 
 if (isset($_SESSION['admin_id'])) {
@@ -21,6 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $admin = $stmt->fetch();
         
         if ($admin && password_verify($password, $admin['mat_khau_bam'])) {
+            $admin = EncryptionService::decryptFields($admin, PiiFields::USER);
             $_SESSION['admin_id'] = $admin['id'];
             $_SESSION['admin_email'] = $admin['email'];
             $_SESSION['admin_ho_ten'] = $admin['ho_ten'];

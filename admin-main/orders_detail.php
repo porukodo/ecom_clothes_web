@@ -2,6 +2,7 @@
 require_once 'includes/db.php';
 require_once 'includes/auth.php';
 require_once 'includes/functions.php';
+require_once dirname(__DIR__) . '/app/security/AdminPii.php';
 
 checkAdminAuth();
 $page_title = 'Chi tiết đơn hàng';
@@ -97,7 +98,7 @@ $stmt = $pdo->prepare("SELECT dh.*, nd.ho_ten, nd.email, nd.so_dien_thoai
                         LEFT JOIN nguoi_dung nd ON dh.nguoi_dung_id = nd.id 
                         WHERE dh.id = ?");
 $stmt->execute([$order_id]);
-$order = $stmt->fetch();
+$order = AdminPii::decryptUserRow($stmt->fetch());
 
 if (!$order) {
     redirect('orders.php');
@@ -115,7 +116,7 @@ $stmt = $pdo->prepare("SELECT ls.*, nd.ho_ten as nguoi_thay_doi
                         WHERE ls.don_hang_id = ? 
                         ORDER BY ls.tao_luc DESC");
 $stmt->execute([$order_id]);
-$history = $stmt->fetchAll();
+$history = AdminPii::decryptUserRows($stmt->fetchAll());
 
 include 'includes/header.php';
 ?>

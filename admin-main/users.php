@@ -2,6 +2,9 @@
 require_once 'includes/db.php';
 require_once 'includes/auth.php'; // Lưu ý: file này đã sửa ở bước trước
 require_once 'includes/functions.php';
+require_once dirname(__DIR__) . '/app/security/EncryptionService.php';
+require_once dirname(__DIR__) . '/app/security/PiiFields.php';
+require_once dirname(__DIR__) . '/app/security/KeyManager.php';
 
 checkAdminAuth();
 $page_title = 'Quản lý Người dùng';
@@ -21,14 +24,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $trang_thai = $_POST['trang_thai'];
         
         try {
+            $ho_ten_db = $ho_ten !== '' ? EncryptionService::encrypt($ho_ten) : null;
+            $ngay_sinh_db = $ngay_sinh ? EncryptionService::encrypt($ngay_sinh) : null;
+            $sdt_db = $so_dien_thoai !== '' ? EncryptionService::encrypt($so_dien_thoai) : null;
+
             if ($action === 'add') {
                 $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
                 $stmt = $pdo->prepare("INSERT INTO nguoi_dung (email, mat_khau_bam, ho_ten, ngay_sinh, so_dien_thoai, vai_tro, trang_thai) VALUES (?, ?, ?, ?, ?, ?, ?)");
-                $stmt->execute([$email, $password, $ho_ten, $ngay_sinh, $so_dien_thoai, $vai_tro, $trang_thai]);
+                $stmt->execute([$email, $password, $ho_ten_db, $ngay_sinh_db, $sdt_db, $vai_tro, $trang_thai]);
                 showMessage('Thêm người dùng thành công!');
             } else {
                 $stmt = $pdo->prepare("UPDATE nguoi_dung SET ho_ten = ?, ngay_sinh = ?, so_dien_thoai = ?, vai_tro = ?, trang_thai = ? WHERE id = ?");
-                $stmt->execute([$ho_ten, $ngay_sinh, $so_dien_thoai, $vai_tro, $trang_thai, $id]);
+                $stmt->execute([$ho_ten_db, $ngay_sinh_db, $sdt_db, $vai_tro, $trang_thai, $id]);
                 showMessage('Cập nhật người dùng thành công!');
             }
             redirect('users.php');
@@ -59,10 +66,9 @@ $sql = "SELECT * FROM nguoi_dung WHERE 1=1";
 $params = [];
 
 if ($search) {
-    $sql .= " AND (ho_ten LIKE ? OR email LIKE ? OR so_dien_thoai LIKE ?)";
     $searchTerm = "%$search%";
-    $params[] = $searchTerm;
-    $params[] = $searchTerm;
+    // Encrypted PII cannot be searched with SQL LIKE — email remains plaintext for login.
+    $sql .= " AND email LIKE ?";
     $params[] = $searchTerm;
 }
 
@@ -81,6 +87,10 @@ $sql .= " ORDER BY tao_luc DESC";
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $users = $stmt->fetchAll();
+$users = array_map(
+    fn($u) => EncryptionService::decryptFields($u, PiiFields::USER),
+    $users
+);
 // --- KẾT THÚC PHẦN LOGIC ---
 
 include 'includes/header.php';
@@ -192,7 +202,7 @@ include 'includes/header.php';
             <div class="card-body">
                 <form method="GET" action="" class="row g-3">
                     <div class="col-md-4">
-                        <input type="text" name="search" class="form-control bg-light border-0" placeholder="Tìm theo tên, email, SĐT..." value="<?php echo htmlspecialchars($search); ?>">
+                        <input type="text" name="search" class="form-control bg-light border-0" placeholder="Tìm theo email..." value="<?php echo htmlspecialchars($search); ?>">
                     </div>
                     <div class="col-md-3">
                         <select name="role" class="form-select bg-light border-0">

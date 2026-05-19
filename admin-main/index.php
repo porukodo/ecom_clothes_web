@@ -7,6 +7,7 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once 'includes/db.php';
 require_once 'includes/auth.php';
 require_once 'includes/functions.php';
+require_once dirname(__DIR__) . '/app/security/AdminPii.php';
 
 // Kiểm tra quyền Admin
 checkAdminAuth();
@@ -118,7 +119,7 @@ $order_status = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
 $stmt = $pdo->prepare("SELECT d.*, n.ho_ten, n.email FROM don_hang d LEFT JOIN nguoi_dung n ON d.nguoi_dung_id = n.id ORDER BY d.tao_luc DESC LIMIT 6");
 $stmt->execute();
-$recent_orders = $stmt->fetchAll();
+$recent_orders = AdminPii::decryptUserRows($stmt->fetchAll());
 
 // --- E. SẢN PHẨM BÁN CHẠY (LOGIC MỚI: GỘP THEO SẢN PHẨM CHA) ---
 // Nhóm theo ID sản phẩm gốc để tính tổng số lượng bán của tất cả SKU

@@ -2,6 +2,7 @@
 require_once 'includes/db.php';
 require_once 'includes/auth.php';
 require_once 'includes/functions.php';
+require_once dirname(__DIR__) . '/app/security/AdminPii.php';
 
 checkAdminAuth();
 
@@ -43,7 +44,7 @@ $sql .= " ORDER BY dh.tao_luc DESC";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
-$orders = $stmt->fetchAll();
+$orders = AdminPii::decryptUserRows($stmt->fetchAll());
 
 // Thống kê đơn hàng
 $stats = [

@@ -133,7 +133,7 @@
   const passInput  = inputs[1];
 
   // URL API (theo cấu trúc bạn đang dùng /public làm front controller)
-  const API_BASE = 'http://localhost/PTUD_Final/public';
+  const API_BASE = 'http://localhost/ecom_clothes_web/public';
 
   function isValidEmail(email){
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);

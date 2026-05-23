@@ -187,7 +187,7 @@ include 'header.php';
 </main>
 
 <script>
-    const API_BASE = 'http://localhost/PTUD_Final/public';
+    const API_BASE = 'http://localhost/ecom_clothes_web/public';
     const MAX_BUY_PER_SKU = 10;
 
     function qs(name){ return new URLSearchParams(window.location.search).get(name); }
@@ -210,23 +210,23 @@ include 'header.php';
         // Xử lý backslashes từ JSON
         u = u.replace(/\\\//g, '/');
         
-        // Database trả về: "PTUD_Final/images/hoodie/hoodie-zip-street/trang.png"
-        // Cần chuyển thành: "http://localhost/PTUD_Final/images/hoodie/hoodie-zip-street/trang.png"
+        // Database trả về: "ecom_clothes_web/images/hoodie/hoodie-zip-street/trang.png"
+        // Cần chuyển thành: "http://localhost/ecom_clothes_web/images/hoodie/hoodie-zip-street/trang.png"
         
-        // Loại bỏ "PTUD_Final/" nếu có ở đầu (vì sẽ thêm base URL)
-        u = u.replace(/^PTUD_Final\//i, '');
+        // Loại bỏ "ecom_clothes_web/" nếu có ở đầu (vì sẽ thêm base URL)
+        u = u.replace(/^ecom_clothes_web\//i, '');
         u = u.replace(/^PTUD\//i, '');
         
         // Tạo full URL
         const base = window.location.origin; // "http://localhost"
-        const projectPath = '/PTUD_Final'; // Đường dẫn project trong localhost
+        const projectPath = '/ecom_clothes_web'; // Đường dẫn project trong localhost
         
         // Đảm bảo đường dẫn bắt đầu với /
         if(!u.startsWith('/')) {
             u = '/' + u;
         }
         
-        // Kết hợp: http://localhost + /PTUD_Final + /images/...
+        // Kết hợp: http://localhost + /ecom_clothes_web + /images/...
         return base + projectPath + u;
     }
 

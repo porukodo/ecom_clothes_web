@@ -3,7 +3,7 @@
 require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
 
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'PTUD_Final');
+define('DB_NAME', 'ecom_clothes_web');
 define('DB_USER', 'root');
 define('DB_PASS', '');
 define('DB_CHARSET', 'utf8mb4');

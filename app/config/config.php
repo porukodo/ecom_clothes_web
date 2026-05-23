@@ -1,5 +1,5 @@
 <?php
-ini_set('session.cookie_path', '/PTUD_Final');
+ini_set('session.cookie_path', '/ecom_clothes_web');
 ini_set('session.cookie_httponly', '1');
 ini_set('session.use_only_cookies', '1');
 

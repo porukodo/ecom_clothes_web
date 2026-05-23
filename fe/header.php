@@ -1,13 +1,13 @@
 <?php
 // --- GIỮ NGUYÊN ĐƯỜNG DẪN GỐC ---
-$base_url = '/PTUD_Final/fe/'; 
+$base_url = '/ecom_clothes_web/fe/'; 
 // -------------------------
 
 // 1. Khởi tạo Session (Giữ nguyên)
 if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params([
         'lifetime' => 0,
-        'path' => '/PTUD_Final',
+        'path' => '/ecom_clothes_web',
         'httponly' => true,
         'samesite' => 'Lax',
     ]);
@@ -17,7 +17,7 @@ if (session_status() === PHP_SESSION_NONE) {
 // 2. Logic lấy số lượng giỏ hàng (Giữ nguyên logic SQL)
 $cart_count = 0;
 if (isset($_SESSION['nguoi_dung_id'])) {
-    $conn_header = new mysqli("localhost", "root", "", "PTUD_Final");
+    $conn_header = new mysqli("localhost", "root", "", "ecom_clothes_web");
     if (!$conn_header->connect_error) {
         $uid = (int)$_SESSION['nguoi_dung_id'];
         $sql_count = "SELECT SUM(ct.so_luong) as total 

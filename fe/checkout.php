@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 session_set_cookie_params([
   'lifetime' => 0,
-  'path' => '/PTUD_Final',
+  'path' => '/ecom_clothes_web',
   'httponly' => true,
   'samesite' => 'Lax',
 ]);
@@ -292,7 +292,7 @@ include 'header.php';
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    const API_BASE = 'http://localhost/PTUD_Final/public';
+    const API_BASE = 'http://localhost/ecom_clothes_web/public';
     const DEFAULT_SHIPPING = <?php echo (int)$shipping_fee; ?>;
 
     let cart = null;           

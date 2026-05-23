@@ -69,12 +69,12 @@ cd ecom_clothes_web
 
 1. Open phpMyAdmin (or MySQL CLI).
 2. Import `database.sql`.
-3. Ensure database name is `PTUD_Final`.
+3. Ensure database name is `ecom_clothes_web`.
 
 Default DB connection in project files:
 
 - Host: `127.0.0.1` / `localhost`
-- DB name: `PTUD_Final`
+- DB name: `ecom_clothes_web`
 - User: `root`
 - Password: empty (`""`)
 
@@ -87,13 +87,13 @@ If your local configuration is different, update:
 
 Place the project folder under your web root (for XAMPP, typically `htdocs`) as:
 
-`htdocs/PTUD_Final`
+`htdocs/ecom_clothes_web`
 
 Then access:
 
-- Frontend pages: `http://localhost/PTUD_Final/fe/`
-- API health check: `http://localhost/PTUD_Final/public/api/health`
-- Admin area: `http://localhost/PTUD_Final/admin-main/`
+- Frontend pages: `http://localhost/ecom_clothes_web/fe/`
+- API health check: `http://localhost/ecom_clothes_web/public/api/health`
+- Admin area: `http://localhost/ecom_clothes_web/admin-main/`
 
 ## Security Notes (Basic Cybersecurity Practices)
 

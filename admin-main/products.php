@@ -114,9 +114,9 @@ function getProductImageUrl($dbPath, $pdo = null) {
             if ($row && !empty($row['url_anh'])) {
                 // Xử lý đường dẫn ảnh thực
                 $realPath = $row['url_anh'];
-                // Chuyển đổi đường dẫn có PTUD_Final/
-                if (strpos($realPath, 'PTUD_Final/') === 0) {
-                    return '../' . substr($realPath, strlen('PTUD_Final/'));
+                // Chuyển đổi đường dẫn có ecom_clothes_web/
+                if (strpos($realPath, 'ecom_clothes_web/') === 0) {
+                    return '../' . substr($realPath, strlen('ecom_clothes_web/'));
                 }
                 return $realPath;
             }

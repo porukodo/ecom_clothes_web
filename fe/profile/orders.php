@@ -2,7 +2,7 @@
 // profile/orders.php - Trang quản lý đơn hàng
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-$API_BASE = 'http://localhost/PTUD_Final/public';
+$API_BASE = 'http://localhost/ecom_clothes_web/public';
 $cookie = session_name() . '=' . session_id();
 session_write_close();
 
@@ -100,14 +100,14 @@ $user = $data['nguoi_dung'];
         }
         
         // 3. Chuẩn hóa đường dẫn tương đối từ API
-        // API trả về: "PTUD_Final\/images\/hoodie\/hoodie-zip-street\/trang.png"
-        // Cần chuyển thành: "http://localhost/PTUD_Final/images/hoodie/hoodie-zip-street/trang.png"
+        // API trả về: "ecom_clothes_web\/images\/hoodie\/hoodie-zip-street\/trang.png"
+        // Cần chuyển thành: "http://localhost/ecom_clothes_web/images/hoodie/hoodie-zip-street/trang.png"
         
         // Xử lý backslashes escape từ JSON
         let cleanUrl = dbUrl.replace(/\\\//g, '/');
         
-        // Loại bỏ "PTUD_Final/" nếu có ở đầu
-        cleanUrl = cleanUrl.replace(/^PTUD_Final\//i, '');
+        // Loại bỏ "ecom_clothes_web/" nếu có ở đầu
+        cleanUrl = cleanUrl.replace(/^ecom_clothes_web\//i, '');
         
         // Đảm bảo có dấu / ở đầu
         if (!cleanUrl.startsWith('/')) {
@@ -115,7 +115,7 @@ $user = $data['nguoi_dung'];
         }
         
         // Tạo URL đầy đủ
-        const fullUrl = 'http://localhost/PTUD_Final' + cleanUrl;
+        const fullUrl = 'http://localhost/ecom_clothes_web' + cleanUrl;
         console.log('[DEBUG] Full image URL:', fullUrl);
         return fullUrl;
     }

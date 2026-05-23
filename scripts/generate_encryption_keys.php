@@ -61,7 +61,7 @@ ENCRYPTED_AES_KEY={$encryptedAesB64}
 
 # Database (adjust for your XAMPP setup)
 DB_HOST=127.0.0.1
-DB_NAME=PTUD_Final
+DB_NAME=ecom_clothes_web
 DB_USER=root
 DB_PASS=
 ENV;

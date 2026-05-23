@@ -2,7 +2,7 @@
 // userprofile.php - Main entry point, redirect to info page
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-$API_BASE = 'http://localhost/PTUD_Final/public';
+$API_BASE = 'http://localhost/ecom_clothes_web/public';
 $cookie = session_name() . '=' . session_id();
 session_write_close();
 

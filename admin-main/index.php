@@ -161,10 +161,10 @@ function getProductImageUrl($dbPath) {
         return $dbPath;
     }
     
-    // Nếu $dbPath là đường dẫn đầy đủ từ gốc (có PTUD_Final/)
-    if (strpos($dbPath, 'PTUD_Final/') === 0) {
-        // Loại bỏ PTUD_Final/ để lấy đường dẫn tương đối
-        return '../' . substr($dbPath, strlen('PTUD_Final/'));
+    // Nếu $dbPath là đường dẫn đầy đủ từ gốc (có ecom_clothes_web/)
+    if (strpos($dbPath, 'ecom_clothes_web/') === 0) {
+        // Loại bỏ ecom_clothes_web/ để lấy đường dẫn tương đối
+        return '../' . substr($dbPath, strlen('ecom_clothes_web/'));
     }
     
     // Nếu đã là đường dẫn tương đối đúng (từ thư mục admin-main)

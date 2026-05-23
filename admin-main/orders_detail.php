@@ -98,7 +98,7 @@ $stmt = $pdo->prepare("SELECT dh.*, nd.ho_ten, nd.email, nd.so_dien_thoai
                         LEFT JOIN nguoi_dung nd ON dh.nguoi_dung_id = nd.id 
                         WHERE dh.id = ?");
 $stmt->execute([$order_id]);
-$order = AdminPii::decryptUserRow($stmt->fetch());
+$order = AdminPii::decryptOrderRow(AdminPii::decryptUserRow($stmt->fetch()));
 
 if (!$order) {
     redirect('orders.php');

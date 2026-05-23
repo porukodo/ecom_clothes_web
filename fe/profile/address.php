@@ -2,7 +2,7 @@
 // profile/address.php - Trang quản lý địa chỉ hoàn chỉnh
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-$API_BASE = 'http://localhost/PTUD_Final/public'; // Đảm bảo URL này đúng với project của bạn
+$API_BASE = 'http://localhost/ecom_clothes_web/public'; // Đảm bảo URL này đúng với project của bạn
 $cookie = session_name() . '=' . session_id();
 session_write_close();
 

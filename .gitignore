@@ -12,3 +12,8 @@
 
 # Cache
 /tmp/
+
+# Benchmark outputs (regenerate locally)
+scripts/benchmark_results_*.json
+scripts/benchmark_comparison.json
+scripts/benchmark_report.html

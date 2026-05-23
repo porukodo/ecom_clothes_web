@@ -23,11 +23,8 @@ $sql = "SELECT dh.*, nd.ho_ten, nd.email
 $params = [];
 
 if ($search) {
-    $sql .= " AND (dh.ma_don_hang LIKE ? OR dh.nguoi_nhan LIKE ? OR dh.sdt_nguoi_nhan LIKE ?)";
-    $searchTerm = "%$search%";
-    $params[] = $searchTerm;
-    $params[] = $searchTerm;
-    $params[] = $searchTerm;
+    $sql .= " AND dh.ma_don_hang LIKE ?";
+    $params[] = "%$search%";
 }
 
 if ($status_filter) {
@@ -44,7 +41,7 @@ $sql .= " ORDER BY dh.tao_luc DESC";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
-$orders = AdminPii::decryptUserRows($stmt->fetchAll());
+$orders = AdminPii::decryptOrderRows(AdminPii::decryptUserRows($stmt->fetchAll()));
 
 // Thống kê đơn hàng
 $stats = [

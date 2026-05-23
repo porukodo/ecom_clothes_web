@@ -228,7 +228,7 @@
 </main>
 
 <script>
-const API_BASE = 'http://localhost/PTUD_Final/public';
+const API_BASE = 'http://localhost/ecom_clothes_web/public';
 
 function qs(name){
   return new URLSearchParams(window.location.search).get(name);
@@ -268,8 +268,8 @@ function normImgUrl(u){
     console.log('📸 Image debug - Original:', u); // Debug
     
     // Database có thể lưu đường dẫn sai
-    // Ví dụ: "PTUD_Final/images/ao-thun/ao-thun-polo-minimal/trang.png"
-    // Nhưng file thực tế là: "PTUD_Final/images/ao_thun/ao-thun-polo-minimal/trang.png"
+    // Ví dụ: "ecom_clothes_web/images/ao-thun/ao-thun-polo-minimal/trang.png"
+    // Nhưng file thực tế là: "ecom_clothes_web/images/ao_thun/ao-thun-polo-minimal/trang.png"
     // (thư mục "ao_thun" vs "ao-thun")
     
     // Fix common path issues

@@ -1,7 +1,7 @@
 -- V2 branch only: widen columns for AES-256-GCM ciphertext (Tier A + B).
--- Run against PTUD_Final after backup. Does NOT encrypt don_hang (Tier C).
+-- Run against ecom_clothes_web after backup. Does NOT encrypt don_hang (Tier C).
 
-USE `PTUD_Final`;
+USE `ecom_clothes_web`;
 
 -- Tier A: nguoi_dung (email stays plaintext for login)
 ALTER TABLE `nguoi_dung`

@@ -34,7 +34,7 @@ register_shutdown_function(function() {
 
 session_set_cookie_params([
   'lifetime' => 0,
-  'path' => '/PTUD_Final',
+  'path' => '/ecom_clothes_web',
   'httponly' => true,
   'samesite' => 'Lax',
 ]);
@@ -55,7 +55,7 @@ function json($data, int $code = 200): void {
 $method = $_SERVER['REQUEST_METHOD'];
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-$prefix = '/PTUD_Final/public';
+$prefix = '/ecom_clothes_web/public';
 if (str_starts_with($path, $prefix)) {
   $path = substr($path, strlen($prefix));
 }

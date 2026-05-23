@@ -9,7 +9,7 @@ final class Database {
 
     // Config cứng cho XAMPP local (MVP)
     $host = '127.0.0.1';
-    $db   = 'PTUD_Final';
+    $db   = 'ecom_clothes_web';
     $user = 'root';
     $pass = '';        
     $port = 3306;

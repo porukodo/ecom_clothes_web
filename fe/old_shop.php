@@ -115,7 +115,7 @@
                     <button class="btn btn-outline-dark" id="btnNext">Trang sau</button>
                 </div> </div> </div> </div> </main>
 <script>
-const API_BASE = 'http://localhost/PTUD_Final/public';
+const API_BASE = 'http://localhost/ecom_clothes_web/public';
 
 function qs(name){
   return new URLSearchParams(window.location.search).get(name);

@@ -4,14 +4,14 @@ declare(strict_types=1);
 // Đồng bộ cookie path giống FE + BE
 session_set_cookie_params([
   'lifetime' => 0,
-  'path' => '/PTUD_Final',
+  'path' => '/ecom_clothes_web',
   'httponly' => true,
   'samesite' => 'Lax',
 ]);
 
 session_start();
 
-$API_BASE = 'http://localhost/PTUD_Final/public';
+$API_BASE = 'http://localhost/ecom_clothes_web/public';
 
 // Lưu cookie session hiện tại để gửi cho API
 $cookieName = session_name();
@@ -39,7 +39,7 @@ session_start();
 $_SESSION = [];
 
 if (ini_get("session.use_cookies")) {
-  setcookie($cookieName, '', time() - 42000, '/PTUD_Final');
+  setcookie($cookieName, '', time() - 42000, '/ecom_clothes_web');
 }
 session_destroy();
 

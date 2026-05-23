@@ -238,7 +238,7 @@
         button.textContent = 'ĐANG TẠO...';
 
         try {
-            const res = await fetch('http://localhost/PTUD_Final/public/api/auth/dang-ky', {
+            const res = await fetch('http://localhost/ecom_clothes_web/public/api/auth/dang-ky', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             credentials: 'include',

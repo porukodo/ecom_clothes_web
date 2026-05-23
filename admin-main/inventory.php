@@ -106,7 +106,7 @@ if (!empty($skus)) {
     // Test URL trực tiếp
     $testUrl = $skus[0]['anh_url'] ?? '';
     if ($testUrl) {
-        $testUrl = preg_replace('/^PTUD_Final\//i', '', $testUrl);
+        $testUrl = preg_replace('/^ecom_clothes_web\//i', '', $testUrl);
         if (strpos($testUrl, '/') !== 0) {
             $testUrl = '/' . $testUrl;
         }

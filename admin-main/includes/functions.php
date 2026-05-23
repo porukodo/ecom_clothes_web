@@ -123,7 +123,7 @@ function normalizeImageUrl($dbUrl) {
     }
     
     // Chuẩn hóa đường dẫn tương đối từ database
-    // Giữ nguyên 'PTUD_Final/' nếu có ở đầu (đây là thư mục gốc của project)
+    // Giữ nguyên 'ecom_clothes_web/' nếu có ở đầu (đây là thư mục gốc của project)
     $cleanUrl = $dbUrl;
     
     // Đảm bảo có dấu / ở đầu

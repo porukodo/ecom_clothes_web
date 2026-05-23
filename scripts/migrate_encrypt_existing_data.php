@@ -86,4 +86,33 @@ foreach ($addresses as $row) {
 }
 
 echo "  Updated {$addressUpdates} address row(s).\n";
+
+echo "Encrypting don_hang PII (Tier C)...\n";
+$orderFields = PiiFields::ORDER;
+$orders = $pdo->query('SELECT id, nguoi_nhan, sdt_nguoi_nhan, dia_chi_giao_hang FROM don_hang')->fetchAll(PDO::FETCH_ASSOC);
+$orderUpdates = 0;
+
+foreach ($orders as $order) {
+    $sets = [];
+    $params = ['id' => $order['id']];
+
+    foreach ($orderFields as $field) {
+        $value = $order[$field] ?? null;
+        if ($value === null || $value === '' || EncryptionService::isEncrypted((string)$value)) {
+            continue;
+        }
+        $sets[] = "{$field} = :{$field}";
+        $params[$field] = EncryptionService::encrypt((string)$value);
+    }
+
+    if ($sets === []) {
+        continue;
+    }
+
+    $sql = 'UPDATE don_hang SET ' . implode(', ', $sets) . ' WHERE id = :id';
+    $pdo->prepare($sql)->execute($params);
+    $orderUpdates++;
+}
+
+echo "  Updated {$orderUpdates} order row(s).\n";
 echo "Done.\n";

@@ -2,9 +2,26 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../Database.php';
+require_once __DIR__ . '/../security/EncryptionService.php';
+require_once __DIR__ . '/../security/PiiFields.php';
 
 final class Order
 {
+    private static function encryptOrderData(array $data): array
+    {
+        foreach (PiiFields::ORDER as $field) {
+            if (isset($data[$field]) && $data[$field] !== '') {
+                $data[$field] = EncryptionService::encrypt((string)$data[$field]);
+            }
+        }
+        return $data;
+    }
+
+    private static function decryptRow(array $row): array
+    {
+        return EncryptionService::decryptFields($row, PiiFields::ORDER);
+    }
+
     private static function taoMaDonHang(): string
     {
         // VD: DH20251217-AB12CD
@@ -74,6 +91,7 @@ final class Order
             if ($ma_km === '') $ma_km = null;
 
             // 4. Tạo đơn hàng
+            $info = self::encryptOrderData($info);
             $stmt = $pdo->prepare("
                 INSERT INTO don_hang (
                     ma_don_hang, nguoi_dung_id, ma_khuyen_mai, trang_thai, phuong_thuc_thanh_toan,
@@ -82,17 +100,17 @@ final class Order
                 ) VALUES (?, ?, ?, 'CHO_XU_LY', ?, 'CHUA_THANH_TOAN', ?, ?, ?, ?, ?, ?, ?, ?, NOW())
             ");
             $stmt->execute([
-                $ma_don, 
-                $nguoi_dung_id, 
+                $ma_don,
+                $nguoi_dung_id,
                 $ma_km,
                 $info['phuong_thuc_thanh_toan'] ?? 'COD',
-                $tam_tinh, 
-                $phi_ship, 
+                $tam_tinh,
+                $phi_ship,
                 $giam_gia,
-                $tong_tien, 
-                $info['nguoi_nhan'], 
+                $tong_tien,
+                $info['nguoi_nhan'],
                 $info['sdt_nguoi_nhan'],
-                $info['dia_chi_giao_hang'], 
+                $info['dia_chi_giao_hang'],
                 $info['ghi_chu'] ?? null
             ]);
             
@@ -252,7 +270,9 @@ final class Order
 
             // Lấy mã khuyến mãi từ payload
             $ma_km = isset($payload['ma_khuyen_mai']) ? (string)$payload['ma_khuyen_mai'] : null;
-            if ($ma_km === '') $ma_km = null; 
+            if ($ma_km === '') $ma_km = null;
+
+            $payload = self::encryptOrderData($payload);
 
             $stm = $pdo->prepare("
                 INSERT INTO don_hang
@@ -427,6 +447,7 @@ final class Order
         $stm->execute(['id' => $don_hang_id, 'uid' => $uid]);
         $dh = $stm->fetch();
         if (!$dh) return ['ok' => false, 'code' => 404, 'error' => 'Không tìm thấy đơn hàng'];
+        $dh = self::decryptRow($dh);
 
         // Hàm này dùng SELECT * nên tự động lấy được sku_id nếu DB đã có cột đó
         $stm = $pdo->prepare("

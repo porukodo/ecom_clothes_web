@@ -16,7 +16,7 @@
   const isLoggedIn = <?php echo isset($_SESSION['nguoi_dung_id']) ? 'true' : 'false'; ?>;
 
   // 2) API base
-  const API_BASE = 'http://localhost/PTUD_Final/public';
+  const API_BASE = 'http://localhost/ecom_clothes_web/public';
 
   // 3) State
   let cart = null; // { gio_hang_id, items, tam_tinh }
@@ -43,16 +43,16 @@
       }
       
       // 4. Chuẩn hóa đường dẫn tương đối từ database
-      // Loại bỏ 'PTUD_Final/' nếu có ở đầu
-      let cleanUrl = dbUrl.replace(/^PTUD_Final\//i, '');
+      // Loại bỏ 'ecom_clothes_web/' nếu có ở đầu
+      let cleanUrl = dbUrl.replace(/^ecom_clothes_web\//i, '');
       
       // Đảm bảo có dấu / ở đầu
       if (!cleanUrl.startsWith('/')) {
           cleanUrl = '/' + cleanUrl;
       }
       
-      // Tạo URL đầy đủ: http://localhost + /PTUD_Final + /images/...
-      const fullUrl = 'http://localhost/PTUD_Final' + cleanUrl;
+      // Tạo URL đầy đủ: http://localhost + /ecom_clothes_web + /images/...
+      const fullUrl = 'http://localhost/ecom_clothes_web' + cleanUrl;
       console.log('[DEBUG] Full image URL:', fullUrl);
       return fullUrl;
   }
@@ -302,7 +302,7 @@
     console.log('Normalized URL:', normalizeImageUrl(it.anh_dai_dien_url));
 
     // Và test trực tiếp URL
-    const testUrl = 'http://localhost/PTUD_Final/images/hoodie/hoodie-oversize-basic/den.png';
+    const testUrl = 'http://localhost/ecom_clothes_web/images/hoodie/hoodie-oversize-basic/den.png';
     console.log('Testing URL:', testUrl);
   }
 

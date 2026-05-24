@@ -204,12 +204,12 @@ include 'includes/header.php';
                             <?php foreach ($orders as $order): ?>
                                 <tr>
                                     <td class="ps-4">
-                                        <div class="fw-bold font-monospace text-primary"><?php echo $order['ma_don_hang']; ?></div>
-                                        <div class="text-secondary small"><?php echo $order['phuong_thuc_thanh_toan']; ?></div>
+                                        <div class="fw-bold font-monospace text-primary"><?php echo e($order['ma_don_hang']); ?></div>
+                                        <div class="text-secondary small"><?php echo e($order['phuong_thuc_thanh_toan']); ?></div>
                                     </td>
                                     <td>
-                                        <div class="fw-bold"><?php echo $order['nguoi_nhan']; ?></div>
-                                        <div class="text-secondary small"><?php echo $order['sdt_nguoi_nhan']; ?></div>
+                                        <div class="fw-bold"><?php echo e($order['nguoi_nhan']); ?></div>
+                                        <div class="text-secondary small"><?php echo e($order['sdt_nguoi_nhan']); ?></div>
                                     </td>
                                     <td class="fw-bold text-dark"><?php echo formatPrice($order['tong_tien']); ?></td>
                                     <td>

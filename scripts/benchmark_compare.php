@@ -5,6 +5,11 @@
  */
 declare(strict_types=1);
 
+if (PHP_SAPI !== 'cli') {
+    http_response_code(403);
+    exit('Forbidden: this script must be run from the command line.');
+}
+
 $root = dirname(__DIR__);
 $mainFile = $root . '/scripts/benchmark_results_main.json';
 $v2File = $root . '/scripts/benchmark_results_V2.json';

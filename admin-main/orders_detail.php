@@ -250,15 +250,15 @@ include 'includes/header.php';
                     <div class="card-body p-4">
                         <div class="mb-3">
                             <div class="text-secondary small mb-1">Họ tên:</div>
-                            <div class="fw-bold"><?php echo $order['ho_ten'] ?? 'N/A'; ?></div>
+                            <div class="fw-bold"><?php echo e($order['ho_ten'], 'N/A'); ?></div>
                         </div>
                         <div class="mb-3">
                             <div class="text-secondary small mb-1">Email:</div>
-                            <div><?php echo $order['email'] ?? 'N/A'; ?></div>
+                            <div><?php echo e($order['email'], 'N/A'); ?></div>
                         </div>
                         <div>
                             <div class="text-secondary small mb-1">Số điện thoại:</div>
-                            <div class="fw-bold"><?php echo $order['so_dien_thoai'] ?? 'N/A'; ?></div>
+                            <div class="fw-bold"><?php echo e($order['so_dien_thoai'], 'N/A'); ?></div>
                         </div>
                     </div>
                 </div>
@@ -270,20 +270,20 @@ include 'includes/header.php';
                     <div class="card-body p-4">
                         <div class="mb-3">
                             <div class="text-secondary small mb-1">Người nhận:</div>
-                            <div class="fw-bold"><?php echo $order['nguoi_nhan']; ?></div>
+                            <div class="fw-bold"><?php echo e($order['nguoi_nhan']); ?></div>
                         </div>
                         <div class="mb-3">
                             <div class="text-secondary small mb-1">SĐT người nhận:</div>
-                            <div class="fw-bold"><?php echo $order['sdt_nguoi_nhan']; ?></div>
+                            <div class="fw-bold"><?php echo e($order['sdt_nguoi_nhan']); ?></div>
                         </div>
                         <div class="mb-3">
                             <div class="text-secondary small mb-1">Địa chỉ:</div>
-                            <div><?php echo $order['dia_chi_giao_hang']; ?></div>
+                            <div><?php echo e($order['dia_chi_giao_hang']); ?></div>
                         </div>
                         <?php if ($order['ghi_chu']): ?>
                         <div>
                             <div class="text-secondary small mb-1">Ghi chú:</div>
-                            <div class="fst-italic"><?php echo $order['ghi_chu']; ?></div>
+                            <div class="fst-italic"><?php echo e($order['ghi_chu']); ?></div>
                         </div>
                         <?php endif; ?>
                     </div>
@@ -296,7 +296,7 @@ include 'includes/header.php';
                     <div class="card-body p-4">
                         <div class="mb-3">
                             <div class="text-secondary small mb-1">Phương thức:</div>
-                            <div class="fw-bold"><?php echo $order['phuong_thuc_thanh_toan']; ?></div>
+                            <div class="fw-bold"><?php echo e($order['phuong_thuc_thanh_toan']); ?></div>
                         </div>
                         <div class="mb-3">
                             <div class="text-secondary small mb-1">Trạng thái hiện tại:</div>
@@ -389,15 +389,15 @@ include 'includes/header.php';
                                     </div>
                                     <div class="text-secondary small mb-1">
                                         <?php if ($h['tu_trang_thai']): ?>
-                                            Từ: <span class="fw-bold"><?php echo $h['tu_trang_thai']; ?></span>
+                                            Từ: <span class="fw-bold"><?php echo e($h['tu_trang_thai']); ?></span>
                                         <?php endif; ?>
-                                        → Đến: <span class="fw-bold text-primary"><?php echo $h['den_trang_thai']; ?></span>
+                                        → Đến: <span class="fw-bold text-primary"><?php echo e($h['den_trang_thai']); ?></span>
                                     </div>
                                     <?php if ($h['ghi_chu']): ?>
-                                        <div class="text-danger small fst-italic mb-1">Note: <?php echo $h['ghi_chu']; ?></div>
+                                        <div class="text-danger small fst-italic mb-1">Note: <?php echo e($h['ghi_chu']); ?></div>
                                     <?php endif; ?>
                                     <?php if ($h['nguoi_thay_doi']): ?>
-                                        <div class="text-secondary small">Bởi: <?php echo $h['nguoi_thay_doi']; ?></div>
+                                        <div class="text-secondary small">Bởi: <?php echo e($h['nguoi_thay_doi']); ?></div>
                                     <?php endif; ?>
                                 </div>
                             <?php endforeach; ?>

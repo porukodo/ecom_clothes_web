@@ -85,6 +85,13 @@ function redirect($url) {
     exit;
 }
 
+/**
+ * HTML-escape a value for safe output. Use for every echo of user/DB data.
+ */
+function e(?string $value, string $fallback = ''): string {
+    return htmlspecialchars($value ?? $fallback, ENT_QUOTES, 'UTF-8');
+}
+
 function showMessage($message, $type = 'success') {
     $_SESSION['message'] = $message;
     $_SESSION['message_type'] = $type;
@@ -94,8 +101,9 @@ function displayMessage() {
     if (isset($_SESSION['message'])) {
         $type = $_SESSION['message_type'] ?? 'success';
         $bgClass = $type === 'success' ? 'success' : 'danger';
+        $safeMessage = e($_SESSION['message']);
         echo "<div class='alert alert-{$bgClass} alert-dismissible fade show' role='alert'>
-                {$_SESSION['message']}
+                {$safeMessage}
                 <button type='button' class='btn-close' data-bs-dismiss='alert'></button>
               </div>";
         unset($_SESSION['message'], $_SESSION['message_type']);

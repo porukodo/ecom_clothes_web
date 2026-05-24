@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Báo cáo Hiệu năng — Mã hóa AES-256-GCM</title>
+<link  rel="stylesheet"
+       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+  body        { background: #f1f5f9; }
+  .hero       { background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+                color: #fff; padding: 3rem 0 2.5rem; }
+  .hero small { opacity: .75; }
+  .stat-card  { border: none; border-radius: .75rem; box-shadow: 0 1px 6px rgba(0,0,0,.08); }
+  .section    { border: none; border-radius: .75rem; box-shadow: 0 1px 6px rgba(0,0,0,.08);
+                margin-bottom: 2rem; }
+  .conclusion { border-left: 5px solid #2563eb; background: #fff; border-radius: .75rem;
+                box-shadow: 0 1px 6px rgba(0,0,0,.08); }
+  th, td      { vertical-align: middle !important; }
+</style>
+</head>
+<body>
+
+<!-- ── Hero ─────────────────────────────────────────────────────────────── -->
+<div class="hero text-center">
+  <div class="container">
+    <h1 class="fw-bold display-5 mb-2">Báo cáo Hiệu năng Truy vấn CSDL</h1>
+    <p class="lead mb-1">Hệ thống Thương mại điện tử — Phân tích overhead khi áp dụng mã hóa AES-256-GCM + RSA-2048</p>
+    <small>Thực hiện: 24/05/2026 05:37:29 &nbsp;|&nbsp; Mã hóa: BẬT — AES-256-GCM + RSA-2048</small>
+  </div>
+</div>
+
+<div class="container py-5">
+
+<!-- ── Summary cards ────────────────────────────────────────────────────── -->
+<div class="row g-3 mb-5">
+  <div class="col-6 col-md-3">
+    <div class="card stat-card text-center p-3">
+      <div class="display-6 fw-bold text-primary">4000</div>
+      <div class="text-secondary small">Người dùng test</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card text-center p-3">
+      <div class="display-6 fw-bold text-success">4000</div>
+      <div class="text-secondary small">Địa chỉ test</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card text-center p-3">
+      <div class="display-6 fw-bold text-warning">2000</div>
+      <div class="text-secondary small">Đơn hàng test</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card text-center p-3">
+      <div class="display-6 fw-bold text-danger">300</div>
+      <div class="text-secondary small">Lần lặp / query</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Chart 1: Mean query time ─────────────────────────────────────────── -->
+<div class="card section">
+  <div class="card-header bg-white border-0 pt-4 pb-2 px-4">
+    <h5 class="fw-bold mb-0">📊 Thời gian Truy vấn Trung bình (ms)</h5>
+    <p class="text-secondary small mb-0">So sánh thời gian SQL thuần với thời gian đầy đủ khi có mã hóa AES-256-GCM</p>
+  </div>
+  <div class="card-body p-4">
+    <canvas id="chartMean" height="90"></canvas>
+  </div>
+</div>
+
+<!-- ── Chart 2: Overhead % ──────────────────────────────────────────────── -->
+<div class="card section">
+  <div class="card-header bg-white border-0 pt-4 pb-2 px-4">
+    <h5 class="fw-bold mb-0">⚡ Overhead do Mã hóa (%)</h5>
+    <p class="text-secondary small mb-0">
+      Phần trăm tăng thêm của mỗi truy vấn khi bổ sung lớp mã hóa/giải mã AES-256-GCM tại tầng ứng dụng.
+      <span class="text-success fw-semibold">Xanh &lt; 40%</span> ·
+      <span class="text-warning fw-semibold">Vàng 40–100%</span> ·
+      <span class="text-danger fw-semibold">Đỏ &gt; 100%</span>
+    </p>
+  </div>
+  <div class="card-body p-4">
+    <canvas id="chartOverhead" height="70"></canvas>
+  </div>
+</div>
+
+<!-- ── Stats table ──────────────────────────────────────────────────────── -->
+<div class="card section">
+  <div class="card-header bg-white border-0 pt-4 pb-2 px-4">
+    <h5 class="fw-bold mb-0">📋 Thống kê Chi tiết (ms)</h5>
+    <p class="text-secondary small mb-0">Tất cả giá trị đơn vị milli-giây (ms) — 300 lần lặp, warmup 30 lần</p>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-bordered table-sm mb-0" style="font-size:.85rem">
+        <thead class="table-dark">
+          <tr>
+            <th>Query</th><th>Mô tả</th><th>Chế độ</th>
+            <th>Min</th><th>Trung bình</th><th>Trung vị</th>
+            <th>P95</th><th>Max</th><th>Overhead</th>
+          </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td rowspan='2' class='align-middle fw-semibold' style='background:#f0fdf4'>Q1</td>
+            <td rowspan='2' class='align-middle small text-secondary' style='background:#f0fdf4'>WHERE email = ? · 1 hàng · 3 trường PII</td>
+            <td><span class='badge bg-primary'>SQL thuần</span></td>
+            <td>0.127</td>
+            <td><strong>0.174</strong></td>
+            <td>0.1601</td>
+            <td>0.2596</td>
+            <td>0.4852</td>
+            <td rowspan='2' class='align-middle text-center' style='background:#f0fdf4'><span class='badge' style='background:#22c55e'>-10.5%</span><br>
+                <small class='text-muted'>+-0.0182 ms</small></td>
+        </tr>
+        <tr style='background:#f0fdf4'>
+            <td><span class='badge bg-danger'>Có mã hóa</span></td>
+            <td>0.1251</td>
+            <td><strong>0.1558</strong></td>
+            <td>0.1481</td>
+            <td>0.1938</td>
+            <td>0.5923</td>
+        </tr>
+    
+        <tr>
+            <td rowspan='2' class='align-middle fw-semibold' style='background:#f0fdf4'>Q2</td>
+            <td rowspan='2' class='align-middle small text-secondary' style='background:#f0fdf4'>WHERE id = ? · 1 hàng · 3 trường PII</td>
+            <td><span class='badge bg-primary'>SQL thuần</span></td>
+            <td>0.1258</td>
+            <td><strong>0.1565</strong></td>
+            <td>0.1443</td>
+            <td>0.2167</td>
+            <td>0.7601</td>
+            <td rowspan='2' class='align-middle text-center' style='background:#f0fdf4'><span class='badge' style='background:#22c55e'>-6.8%</span><br>
+                <small class='text-muted'>+-0.0107 ms</small></td>
+        </tr>
+        <tr style='background:#f0fdf4'>
+            <td><span class='badge bg-danger'>Có mã hóa</span></td>
+            <td>0.12</td>
+            <td><strong>0.1458</strong></td>
+            <td>0.139</td>
+            <td>0.1967</td>
+            <td>0.4509</td>
+        </tr>
+    
+        <tr>
+            <td rowspan='2' class='align-middle fw-semibold' style='background:#fff5f5'>Q3</td>
+            <td rowspan='2' class='align-middle small text-secondary' style='background:#fff5f5'>ORDER BY id DESC LIMIT 50 · 150 giải mã</td>
+            <td><span class='badge bg-primary'>SQL thuần</span></td>
+            <td>0.2284</td>
+            <td><strong>0.262</strong></td>
+            <td>0.2563</td>
+            <td>0.3219</td>
+            <td>0.5577</td>
+            <td rowspan='2' class='align-middle text-center' style='background:#fff5f5'><span class='badge' style='background:#ef4444'>195.3%</span><br>
+                <small class='text-muted'>+0.5117 ms</small></td>
+        </tr>
+        <tr style='background:#fff5f5'>
+            <td><span class='badge bg-danger'>Có mã hóa</span></td>
+            <td>0.6928</td>
+            <td><strong>0.7737</strong></td>
+            <td>0.7433</td>
+            <td>0.9167</td>
+            <td>1.8974</td>
+        </tr>
+    
+        <tr>
+            <td rowspan='2' class='align-middle fw-semibold' style='background:#f0fdf4'>Q4</td>
+            <td rowspan='2' class='align-middle small text-secondary' style='background:#f0fdf4'>WHERE nguoi_dung_id = ? · 6 trường PII</td>
+            <td><span class='badge bg-primary'>SQL thuần</span></td>
+            <td>0.1263</td>
+            <td><strong>0.1446</strong></td>
+            <td>0.1378</td>
+            <td>0.1788</td>
+            <td>0.34</td>
+            <td rowspan='2' class='align-middle text-center' style='background:#f0fdf4'><span class='badge' style='background:#22c55e'>10.5%</span><br>
+                <small class='text-muted'>+0.0152 ms</small></td>
+        </tr>
+        <tr style='background:#f0fdf4'>
+            <td><span class='badge bg-danger'>Có mã hóa</span></td>
+            <td>0.1381</td>
+            <td><strong>0.1598</strong></td>
+            <td>0.1551</td>
+            <td>0.1849</td>
+            <td>0.3397</td>
+        </tr>
+    
+        <tr>
+            <td rowspan='2' class='align-middle fw-semibold' style='background:#fffbeb'>Q5</td>
+            <td rowspan='2' class='align-middle small text-secondary' style='background:#fffbeb'>JOIN nguoi_dung · 20 hàng · 40 giải mã</td>
+            <td><span class='badge bg-primary'>SQL thuần</span></td>
+            <td>0.1786</td>
+            <td><strong>0.2134</strong></td>
+            <td>0.2043</td>
+            <td>0.2663</td>
+            <td>0.4343</td>
+            <td rowspan='2' class='align-middle text-center' style='background:#fffbeb'><span class='badge' style='background:#f59e0b'>55%</span><br>
+                <small class='text-muted'>+0.1173 ms</small></td>
+        </tr>
+        <tr style='background:#fffbeb'>
+            <td><span class='badge bg-danger'>Có mã hóa</span></td>
+            <td>0.3044</td>
+            <td><strong>0.3307</strong></td>
+            <td>0.3265</td>
+            <td>0.3788</td>
+            <td>0.4322</td>
+        </tr>
+    
+        <tr>
+            <td rowspan='2' class='align-middle fw-semibold' style='background:#f0fdf4'>Q6</td>
+            <td rowspan='2' class='align-middle small text-secondary' style='background:#f0fdf4'>INSERT · 3 trường mã hóa</td>
+            <td><span class='badge bg-primary'>SQL thuần</span></td>
+            <td>0.3268</td>
+            <td><strong>0.406</strong></td>
+            <td>0.3706</td>
+            <td>0.5695</td>
+            <td>1.5047</td>
+            <td rowspan='2' class='align-middle text-center' style='background:#f0fdf4'><span class='badge' style='background:#22c55e'>0.6%</span><br>
+                <small class='text-muted'>+0.0025 ms</small></td>
+        </tr>
+        <tr style='background:#f0fdf4'>
+            <td><span class='badge bg-danger'>Có mã hóa</span></td>
+            <td>0.3371</td>
+            <td><strong>0.4085</strong></td>
+            <td>0.3862</td>
+            <td>0.539</td>
+            <td>0.9532</td>
+        </tr>
+    
+        <tr>
+            <td rowspan='2' class='align-middle fw-semibold' style='background:#f0fdf4'>Q7</td>
+            <td rowspan='2' class='align-middle small text-secondary' style='background:#f0fdf4'>UPDATE · 2 trường mã hóa</td>
+            <td><span class='badge bg-primary'>SQL thuần</span></td>
+            <td>0.1163</td>
+            <td><strong>0.15</strong></td>
+            <td>0.1349</td>
+            <td>0.2186</td>
+            <td>0.7113</td>
+            <td rowspan='2' class='align-middle text-center' style='background:#f0fdf4'><span class='badge' style='background:#22c55e'>29%</span><br>
+                <small class='text-muted'>+0.0435 ms</small></td>
+        </tr>
+        <tr style='background:#f0fdf4'>
+            <td><span class='badge bg-danger'>Có mã hóa</span></td>
+            <td>0.1648</td>
+            <td><strong>0.1935</strong></td>
+            <td>0.1801</td>
+            <td>0.2863</td>
+            <td>0.4975</td>
+        </tr>
+    </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ── Conclusion ───────────────────────────────────────────────────────── -->
+<div class="card conclusion p-4 mb-4">
+  <h4 class="fw-bold text-primary mb-3">🔍 Kết luận</h4>
+  
+<p>Qua kết quả benchmark thực hiện trên <strong>4000 bản ghi</strong> người dùng với
+<strong>300 lần lặp</strong> cho mỗi loại truy vấn, có thể rút ra các nhận xét sau:</p>
+
+<ol class='mt-3'>
+  <li class='mb-2'>
+    <strong>Overhead trung bình toàn hệ thống đạt 39%</strong> khi bổ sung lớp mã hóa
+    AES-256-GCM so với truy vấn SQL thuần túy. Đây là mức overhead chấp nhận được đối với
+    ứng dụng thương mại điện tử thực tế.
+  </li>
+  <li class='mb-2'>
+    <strong>Truy vấn bị ảnh hưởng nhiều nhất</strong> là <em>Q3 — DS khách hàng/50</em> với overhead
+    <strong>195.3%</strong> — do phải thực hiện nhiều lần giải mã đồng thời trên
+    nhiều hàng và nhiều trường PII.
+  </li>
+  <li class='mb-2'>
+    <strong>Truy vấn ít bị ảnh hưởng nhất</strong> là <em>Q1 — Đăng nhập</em> với chỉ
+    <strong>-10.5%</strong> overhead — phản ánh các truy vấn trả về ít trường PII
+    hoặc không cần giải mã phía ứng dụng.
+  </li>
+  <li class='mb-2'>
+    <strong>Chi phí mã hóa/giải mã một trường PII</strong> ước tính khoảng
+    <strong>-0.0036 ms</strong> (đo qua Q2: 1 hàng × 3 trường),
+    phản ánh độ trễ của phép toán AES-256-GCM kết hợp base64 và xác thực GCM tag.
+  </li>
+  <li class='mb-2'>
+    <strong>Truy vấn ghi dữ liệu (Q6 — Đăng ký, Q7 — Cập nhật)</strong> có overhead thấp hơn
+    các truy vấn đọc nhiều hàng, bởi chỉ mã hóa 2–3 trường PII trước khi INSERT/UPDATE.
+  </li>
+  <li class='mb-2'>
+    Toàn bộ {7} loại truy vấn đều hoàn thành trong dưới <strong>5 ms</strong>,
+           đảm bảo trải nghiệm người dùng mượt mà ngay cả với lớp mã hóa được bật.
+  </li>
+</ol>
+
+<p class='mt-3 mb-0'>
+  <strong>Kết luận chung:</strong> Việc áp dụng mã hóa <strong>AES-256-GCM</strong> kết hợp
+  quản lý khóa <strong>RSA-2048 OAEP</strong> để bảo vệ dữ liệu PII nhạy cảm (họ tên, số điện
+  thoại, ngày sinh, địa chỉ) mang lại sự đánh đổi hợp lý giữa bảo mật và hiệu năng. Với mức
+  overhead trung bình <strong>39%</strong> và thời gian phản hồi vẫn ở mức chấp nhận
+  được, mô hình mã hóa theo tầng (Tier A/B/C) đã triển khai là giải pháp phù hợp cho hệ thống
+  thương mại điện tử quy mô vừa và nhỏ tại Việt Nam.
+</p>
+
+</div>
+
+<p class="text-center text-muted small pb-4">
+  Báo cáo được sinh tự động bởi
+  <code>scripts/run_query_benchmark.php</code> &nbsp;·&nbsp;
+  Dự án: <em>ecom_clothes_web — Đồ án môn Nhập môn An toàn Thông tin</em>
+</p>
+
+</div><!-- /container -->
+
+<script>
+const LABELS   = ["Q1 — Đăng nhập","Q2 — Trang cá nhân","Q3 — DS khách hàng\/50","Q4 — Địa chỉ giao hàng","Q5 — Đơn hàng + JOIN","Q6 — Đăng ký (INSERT)","Q7 — Cập nhật (UPDATE)"];
+const SQL_DATA = [0.173999999999999988009591334048309363424777984619140625,0.1565000000000000002220446049250313080847263336181640625,0.262000000000000010658141036401502788066864013671875,0.144600000000000006306066779870889149606227874755859375,0.2134000000000000063504757008558954112231731414794921875,0.40600000000000002753353101070388220250606536865234375,0.1499999999999999944488848768742172978818416595458984375];
+const APP_DATA = [0.155799999999999994049204588009160943329334259033203125,0.1458000000000000129229960066368221305310726165771484375,0.7737000000000000543565192856476642191410064697265625,0.159799999999999997601918266809661872684955596923828125,0.3306999999999999939603867460391484200954437255859375,0.40849999999999997424282582869636826217174530029296875,0.1935000000000000053290705182007513940334320068359375];
+const OH_DATA  = [-10.5,-6.79999999999999982236431605997495353221893310546875,195.30000000000001136868377216160297393798828125,10.5,55,0.59999999999999997779553950749686919152736663818359375,29];
+
+const overheadColors = OH_DATA.map(v =>
+    v > 100 ? 'rgba(239,68,68,.85)'
+            : v > 40  ? 'rgba(245,158,11,.85)'
+                      : 'rgba(34,197,94,.85)'
+);
+
+// Chart 1 — grouped bar
+new Chart(document.getElementById('chartMean'), {
+  type: 'bar',
+  data: {
+    labels: LABELS,
+    datasets: [
+      {
+        label: 'SQL thuần (không giải mã)',
+        data: SQL_DATA,
+        backgroundColor: 'rgba(37,99,235,.75)',
+        borderColor:     'rgba(37,99,235,1)',
+        borderWidth: 1,
+        borderRadius: 4,
+      },
+      {
+        label: 'Có mã hóa AES-256-GCM',
+        data: APP_DATA,
+        backgroundColor: 'rgba(239,68,68,.75)',
+        borderColor:     'rgba(239,68,68,1)',
+        borderWidth: 1,
+        borderRadius: 4,
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'top' },
+      tooltip: {
+        callbacks: {
+          label: ctx => ' ' + ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(4) + ' ms',
+        },
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: { display: true, text: 'Thời gian (ms)' },
+        ticks: { callback: v => v.toFixed(2) + ' ms' },
+      },
+      x: { ticks: { font: { size: 11 } } },
+    },
+  },
+});
+
+// Chart 2 — overhead %
+new Chart(document.getElementById('chartOverhead'), {
+  type: 'bar',
+  data: {
+    labels: LABELS,
+    datasets: [{
+      label: 'Overhead (%)',
+      data: OH_DATA,
+      backgroundColor: overheadColors,
+      borderColor:     overheadColors.map(c => c.replace('.85', '1')),
+      borderWidth: 1,
+      borderRadius: 4,
+    }],
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => ' Overhead: +' + ctx.parsed.x.toFixed(1) + '%',
+        },
+      },
+    },
+    scales: {
+      x: {
+        beginAtZero: true,
+        title: { display: true, text: 'Overhead (%)' },
+        ticks: { callback: v => v + '%' },
+      },
+    },
+  },
+});
+</script>
+</body>
+</html>

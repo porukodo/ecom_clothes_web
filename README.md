@@ -50,7 +50,7 @@ This project is built to practice:
 - `images/` - product and UI image assets
 - `database.sql` - database schema and sample data
 
-## Getting Started
+## Getting Started (3 steps)
 
 ### 1) Prerequisites
 
@@ -58,49 +58,79 @@ This project is built to practice:
 - PHP 8.x recommended
 - MySQL/MariaDB running locally
 
-### 2) Clone the repository
+### 2) Clone and place in htdocs
 
 ```bash
+cd /Applications/XAMPP/xamppfiles/htdocs        # macOS XAMPP
 git clone git@github.com:porukodo/ecom_clothes_web.git
-cd ecom_clothes_web
 ```
 
-### 3) Database setup
+Then fix `.env` permissions so Apache can read the encryption keys:
 
-1. Open phpMyAdmin (or MySQL CLI).
-2. Import `database.sql`.
-3. Ensure database name is `ecom_clothes_web`.
+```bash
+chmod 644 ecom_clothes_web/.env
+```
 
-Default DB connection in project files:
+### 3) Import the database
+
+1. Start XAMPP (Apache + MySQL).
+2. Open phpMyAdmin at `http://localhost/phpmyadmin`.
+3. Create a new database named `ecom_clothes_web`.
+4. Click **Import** → select `database.sql` → click **Go**.
+
+That's it. The database dump already includes the V2 schema migrations, 4 000 benchmark users with encrypted PII, and 2 000 benchmark orders.
+
+### Access the app
+
+| Page | URL |
+|------|-----|
+| Frontend (shop) | `http://localhost/ecom_clothes_web/fe/` |
+| Admin panel | `http://localhost/ecom_clothes_web/admin-main/` |
+| API health check | `http://localhost/ecom_clothes_web/public/api/health` |
+| Benchmark report | `http://localhost/ecom_clothes_web/public/benchmark_report.html` |
+
+**Admin login:** `admin@gmail.com` / `123456789`
+
+### (Optional) Re-run the benchmark yourself
+
+```bash
+/Applications/XAMPP/xamppfiles/bin/php scripts/run_query_benchmark.php
+```
+
+This regenerates `public/benchmark_report.html` with fresh results from your machine.
+
+### Default DB connection
 
 - Host: `127.0.0.1` / `localhost`
 - DB name: `ecom_clothes_web`
 - User: `root`
 - Password: empty (`""`)
 
-If your local configuration is different, update:
+If your local configuration is different, update `app/Database.php` and `admin-main/includes/db.php`.
 
-- `app/Database.php`
-- `admin-main/includes/db.php`
+## Security Notes
 
-### 4) Serve the project
+### Encryption (V2 — Introduction to Cybersecurity)
 
-Place the project folder under your web root (for XAMPP, typically `htdocs`) as:
+- Customer PII (name, phone, birthday, address) is encrypted at rest using **AES-256-GCM**
+- The AES data key is wrapped with **RSA-2048 OAEP** — only the encrypted key is stored in `.env`
+- Encryption is applied across three tiers: `nguoi_dung` (Tier A), `dia_chi` (Tier B), `don_hang` (Tier C)
+- See `app/security/` for the full implementation and `public/benchmark_report.html` for performance analysis
 
-`htdocs/ecom_clothes_web`
+> **Note on `.env`:** The `.env` file containing encryption keys is intentionally committed to this
+> repository so that classmates and lecturers can clone and run the project without generating their
+> own keys. **In a real production system, `.env` must never be committed** — it should be listed in
+> `.gitignore` and each deployment should generate its own key set via
+> `php scripts/generate_encryption_keys.php`.
 
-Then access:
+### General web security
 
-- Frontend pages: `http://localhost/ecom_clothes_web/fe/`
-- API health check: `http://localhost/ecom_clothes_web/public/api/health`
-- Admin area: `http://localhost/ecom_clothes_web/admin-main/`
-
-## Security Notes (Basic Cybersecurity Practices)
-
-- Passwords are stored as hashes (not plaintext)
+- Passwords are stored as bcrypt hashes
 - Session cookies are configured with `HttpOnly` and `SameSite` options
-- Database access uses prepared statements through PDO to reduce SQL injection risk
+- Database access uses prepared statements (PDO) to prevent SQL injection
+- Output escaping (`htmlspecialchars`) on all user-supplied data rendered in admin panel
 - Role-based separation between normal users and administrators
+- `.env` and `scripts/` directory blocked from web access via `.htaccess`
 
 ## Future Improvements
 

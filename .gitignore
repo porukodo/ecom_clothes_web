@@ -3,7 +3,10 @@
 
 # XAMPP / PHP
 /vendor/
-.env
+# NOTE: .env is intentionally committed for this course project so that
+# classmates / lecturers can clone-and-run without generating their own keys.
+# In a real production system, .env MUST be in .gitignore.
+# .env
 .env.generated
 *.pem
 

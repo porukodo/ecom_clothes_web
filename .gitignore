@@ -1,0 +1,12 @@
+# OS
+.DS_Store
+
+# XAMPP / PHP
+/vendor/
+.env
+
+# Logs
+*.log
+
+# Cache
+/tmp/

@@ -1,0 +1,470 @@
+/* =========================================
+   VARIABLES & GLOBAL SETTINGS
+   ========================================= */
+:root {
+    /* Màu chủ đạo (Cam Shopee) - Đổi màu này để đổi theme */
+    --primary-color: #ee4d2d; 
+    --primary-hover: #d73211;
+    
+    /* Màu nền & Text */
+    --bg-light: #f8f9fa;
+    --text-main: #333;
+    --text-muted: #666;
+    --border-color: #e5e5e5;
+    
+    /* Màu trạng thái */
+    --status-pending: #ff8c00;
+    --status-confirmed: #1890ff;
+    --status-delivered: #26aa99;
+    --status-cancelled: #999;
+}
+
+/* =========================================
+   1. SIDEBAR & TABS
+   ========================================= */
+.profile-tab {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.profile-tab .nav-link {
+    color: var(--text-muted);
+    font-weight: 500;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color);
+    border-left: 3px solid transparent;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+}
+
+.profile-tab .nav-link:hover {
+    color: var(--text-main);
+    background-color: var(--bg-light);
+}
+
+.profile-tab .nav-link.active {
+    color: var(--primary-color);
+    border-left-color: var(--primary-color);
+    background-color: #fff5f3; /* Màu nền cam nhạt khi active */
+    font-weight: 600;
+}
+
+.profile-tab .nav-link i {
+    width: 24px;
+    text-align: center;
+    margin-right: 12px;
+    font-size: 1.1rem;
+}
+
+/* Sticky Sidebar Desktop */
+@media (min-width: 992px) {
+    .sticky-sidebar {
+        position: sticky;
+        top: 90px; /* Cách header */
+        z-index: 90;
+    }
+}
+
+/* =========================================
+   2. PROFILE CARD & AVATAR
+   ========================================= */
+.profile-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    padding: 30px;
+    height: 100%;
+    border: 1px solid var(--border-color);
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Avatar tạo bằng chữ cái (Fallback) */
+.avatar-initials {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 32px;
+    font-weight: 700;
+    border: 4px solid #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    text-transform: uppercase;
+}
+
+/* =========================================
+   3. GENDER SELECTOR (Custom Radio) - COMPACT VERSION
+   ========================================= */
+.gender-group {
+    display: flex;
+    gap: 10px;       /* Giảm khoảng cách giữa các ô */
+    width: 100%;
+}
+
+.gender-label {
+    flex: 1;
+    text-align: center;
+    /* Giảm padding để ô nhỏ lại */
+    padding: 8px 10px; 
+    border: 1px solid #dee2e6;
+    border-radius: 6px !important; /* Bo góc nhỏ hơn xíu cho gọn */
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    background: #fff;
+    color: var(--text-muted);
+    
+    /* Cấu hình Flexbox để Icon và Chữ luôn nằm ngang */
+    display: flex;
+    flex-direction: row !important; /* Quan trọng: Luôn nằm ngang */
+    align-items: center;
+    justify-content: center;
+    
+    /* Chữ nhỏ hơn */
+    font-size: 0.9rem; 
+    font-weight: 500;
+}
+
+.gender-label:hover {
+    background-color: var(--bg-light);
+    border-color: #adb5bd;
+}
+
+/* Chỉnh icon nhỏ lại và nằm bên trái chữ */
+.gender-label i {
+    font-size: 1rem; /* Kích thước icon nhỏ lại */
+    margin-right: 6px;
+    margin-bottom: 0 !important; /* Bỏ margin bottom nếu có */
+}
+
+/* Active States - Màu sắc khi được chọn */
+.btn-check:checked + .gender-male {
+    background-color: #e7f1ff;
+    border-color: #0d6efd;
+    color: #0d6efd;
+    box-shadow: 0 0 0 1px #0d6efd;
+}
+
+.btn-check:checked + .gender-female {
+    background-color: #fff0f6;
+    border-color: #d63384;
+    color: #d63384;
+    box-shadow: 0 0 0 1px #d63384;
+}
+
+.btn-check:checked + .gender-other {
+    background-color: #f3f0ff;
+    border-color: #6f42c1;
+    color: #6f42c1;
+    box-shadow: 0 0 0 1px #6f42c1;
+}
+/* =========================================
+   4. ORDER TRACKING & TABS
+   ========================================= */
+.header-tabs {
+    background: white;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.tabs-container {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+    gap: 10px;
+    padding: 0 16px;
+}
+
+.tabs-container::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+
+.tab-button {
+    padding: 16px 12px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-size: 15px;
+    white-space: nowrap;
+    color: var(--text-muted);
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.tab-button:hover {
+    color: var(--primary-color);
+}
+
+.tab-button.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    font-weight: 700;
+}
+
+/* =========================================
+   5. SEARCH BOX
+   ========================================= */
+.search-box {
+    position: relative;
+    margin-bottom: 24px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+    pointer-events: none;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 16px 12px 48px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.search-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(238, 77, 45, 0.1);
+}
+
+/* =========================================
+   6. ORDER ITEMS (Product List)
+   ========================================= */
+.order-item-card {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+}
+
+.order-item-card:hover {
+    box-shadow: 0 8px 16px rgba(0,0,0,0.06);
+    transform: translateY(-2px);
+    border-color: #dcdcdc;
+}
+
+.order-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--bg-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    background-color: #fff;
+}
+
+.order-id {
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.order-status-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.status-badge {
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Status Colors Mapping */
+.status-pending { color: var(--status-pending); }
+.status-confirmed { color: var(--status-confirmed); }
+.status-shipping { color: var(--status-confirmed); }
+.status-delivered { color: var(--status-delivered); }
+.status-cancelled { color: var(--status-cancelled); }
+
+/* --- Product Detail Row --- */
+.product-item {
+    padding: 20px 24px;
+    display: flex;
+    gap: 20px;
+    border-bottom: 1px solid var(--bg-light);
+    align-items: flex-start;
+}
+
+.product-item:last-child {
+    border-bottom: none;
+}
+
+.product-image {
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+    border: 1px solid #f1f1f1;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.product-info {
+    flex: 1;
+    min-width: 0; /* Fix lỗi flex item bị tràn trên một số trình duyệt */
+}
+
+.product-name {
+    color: var(--text-main);
+    margin-bottom: 6px;
+    font-weight: 500;
+    font-size: 15px;
+    line-height: 1.4;
+    
+    /* FIX LỖI LINE CLAMP */
+    display: -webkit-box; 
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.product-meta {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.product-price-group {
+    text-align: right;
+    min-width: 110px;
+}
+
+.current-price {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+/* --- Order Footer --- */
+.order-footer {
+    padding: 16px 24px;
+    background: #fafafa;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.total-price {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+/* =========================================
+   7. UTILITIES
+   ========================================= */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+}
+
+.empty-icon {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 16px;
+    color: #e0e0e0;
+}
+
+/* =========================================
+   8. RESPONSIVE DESIGN
+   ========================================= */
+@media (max-width: 991px) {
+    .profile-card {
+        padding: 20px;
+    }
+    
+    /* Mobile Menu Animation */
+    .profile-sidebar-content {
+        display: none;
+        border-top: 1px solid var(--border-color);
+        background: #fff;
+    }
+    
+    .profile-sidebar-content.show {
+        display: block;
+        animation: slideDown 0.3s ease-out;
+    }
+    
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+    }
+    .avatar-initials {
+        width: 80px;
+        height: 80px;
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .product-item {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .product-image {
+        width: 70px;
+        height: 70px;
+    }
+
+    .product-price-group {
+        text-align: left;
+        width: 100%;
+        margin-top: 4px;
+    }
+    
+    .order-footer {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-end;
+    }
+    
+    .action-buttons {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+    
+    /* Đảm bảo 2 nút (Chi tiết & Mua lại) nằm ngang trên mobile */
+    .action-buttons .btn {
+        flex: 1;
+        white-space: nowrap;
+    }
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

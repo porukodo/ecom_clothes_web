@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PTUD_Final - MVP Test Frontend</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 16px; max-width: 1100px; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .card { border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin: 10px 0; }
+    input, button, textarea { padding: 8px; margin: 4px 0; }
+    button { cursor: pointer; }
+    pre { background: #111; color: #0f0; padding: 12px; border-radius: 8px; overflow: auto; max-height: 260px; }
+    small { color: #666; }
+    .muted { color: #777; }
+  </style>
+</head>
+<body>
+  <h2>PTUD_Final - MVP Test Frontend (tối giản)</h2>
+  <p class="muted">
+    Backend base: <code id="base"></code> |
+    <button onclick="apiHealth()">Health</button>
+    <button onclick="authMe()">Auth Me</button>
+  </p>
+
+  <div class="card">
+    <h3>1) Auth (Đăng ký / Đăng nhập / Đăng xuất)</h3>
+    <div class="row">
+      <div style="min-width:320px">
+        <h4>Đăng ký</h4>
+        <input id="reg_email" placeholder="Email" style="width:100%" />
+        <input id="reg_pass" placeholder="Mật khẩu (>=8)" type="password" style="width:100%" />
+        <input id="reg_name" placeholder="Họ tên (optional)" style="width:100%" />
+        <button onclick="authRegister()">Đăng ký</button>
+      </div>
+      <div style="min-width:320px">
+        <h4>Đăng nhập</h4>
+        <input id="login_email" placeholder="Email" style="width:100%" />
+        <input id="login_pass" placeholder="Mật khẩu" type="password" style="width:100%" />
+        <button onclick="authLogin()">Đăng nhập</button>
+        <button onclick="authLogout()">Đăng xuất</button>
+      </div>
+      <div style="min-width:320px">
+        <h4>Trạng thái</h4>
+        <div id="auth_state" class="muted">Chưa xác định</div>
+        <small>* Dùng session cookie, fetch đã bật credentials.</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>2) Products (Danh sách + Tìm kiếm + Chi tiết)</h3>
+    <div class="row">
+      <div style="min-width:360px">
+        <h4>Danh sách</h4>
+        <input id="kw" placeholder="Từ khóa tìm kiếm (optional)" style="width:100%" />
+        <div class="row">
+          <input id="page" placeholder="Trang" value="1" style="width:120px" />
+          <input id="limit" placeholder="Giới hạn" value="10" style="width:120px" />
+          <button onclick="productsList()">Load</button>
+        </div>
+        <small class="muted">Endpoint gợi ý: GET /api/san-pham?tu_khoa=&trang=&gioi_han=</small>
+      </div>
+      <div style="min-width:360px">
+        <h4>Chi tiết</h4>
+        <input id="product_id" placeholder="Nhập Product ID" style="width:100%" />
+        <button onclick="productDetail()">Xem chi tiết</button>
+        <small class="muted">Endpoint gợi ý: GET /api/san-pham/{id}</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>3) Cart (CRUD)</h3>
+    <div class="row">
+      <div style="min-width:360px">
+        <h4>Xem giỏ</h4>
+        <button onclick="cartView()">GET /api/gio-hang</button>
+        <small class="muted">Cần login</small>
+      </div>
+      <div style="min-width:360px">
+        <h4>Thêm vào giỏ</h4>
+        <input id="cart_product_id" placeholder="Product ID" style="width:100%" />
+        <input id="cart_qty" placeholder="Số lượng" value="1" style="width:100%" />
+        <button onclick="cartAdd()">POST /api/gio-hang/them</button>
+      </div>
+      <div style="min-width:360px">
+        <h4>Cập nhật / Xóa</h4>
+        <input id="cart_item_id" placeholder="Cart Item ID" style="width:100%" />
+        <input id="cart_item_qty" placeholder="Số lượng mới" value="2" style="width:100%" />
+        <button onclick="cartUpdate()">PATCH /api/gio-hang/{itemId}</button>
+        <button onclick="cartDelete()">DELETE /api/gio-hang/{itemId}</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>4) Checkout (COD) + Orders (Lịch sử)</h3>
+    <div class="row">
+      <div style="min-width:360px">
+        <h4>Checkout</h4>
+        <input id="ship_name" placeholder="Người nhận" style="width:100%" />
+        <input id="ship_phone" placeholder="SĐT người nhận" style="width:100%" />
+        <input id="ship_addr" placeholder="Địa chỉ giao hàng" style="width:100%" />
+        <textarea id="ship_note" placeholder="Ghi chú (optional)" style="width:100%"></textarea>
+        <button onclick="checkout()">POST /api/checkout</button>
+        <small class="muted">Cần login, giỏ không trống</small>
+      </div>
+
+      <div style="min-width:360px">
+        <h4>Lịch sử đơn</h4>
+        <button onclick="ordersList()">GET /api/don-hang</button>
+        <input id="order_id" placeholder="Order ID để xem chi tiết" style="width:100%" />
+        <button onclick="orderDetail()">GET /api/don-hang/{id}</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>5) Admin (CRUD sản phẩm + xem đơn + cập nhật trạng thái)</h3>
+    <p class="muted">Chỉ để test nhanh. Cần user có vai_tro = QUAN_TRI.</p>
+
+    <div class="row">
+      <div style="min-width:360px">
+        <h4>Admin - Sản phẩm</h4>
+        <button onclick="adminProductsList()">GET /api/admin/san-pham</button>
+        <input id="ap_id" placeholder="ID (để sửa/xóa)" style="width:100%" />
+        <input id="ap_name" placeholder="Tên sản phẩm" style="width:100%" />
+        <input id="ap_slug" placeholder="Đường dẫn (slug)" style="width:100%" />
+        <input id="ap_price" placeholder="Giá bán" style="width:100%" />
+        <input id="ap_stock" placeholder="Số lượng tồn" style="width:100%" />
+        <button onclick="adminProductCreate()">POST /api/admin/san-pham</button>
+        <button onclick="adminProductUpdate()">PATCH /api/admin/san-pham/{id}</button>
+        <button onclick="adminProductDelete()">DELETE /api/admin/san-pham/{id}</button>
+      </div>
+
+      <div style="min-width:360px">
+        <h4>Admin - Đơn hàng</h4>
+        <button onclick="adminOrdersList()">GET /api/admin/don-hang</button>
+        <input id="ao_id" placeholder="Order ID" style="width:100%" />
+        <input id="ao_status" placeholder="Trạng thái (CHO_XU_LY|DANG_XU_LY|HOAN_TAT|HUY)" style="width:100%" />
+        <button onclick="adminOrderUpdateStatus()">PATCH /api/admin/don-hang/{id}/trang-thai</button>
+      </div>
+    </div>
+  </div>
+
+  <h3>Console (Kết quả API)</h3>
+  <pre id="out">{}</pre>
+
+<script>
+  const API_BASE = "http://localhost/PTUD_Final/public";
+  document.getElementById("base").textContent = API_BASE;
+
+  function show(data) {
+    document.getElementById("out").textContent = JSON.stringify(data, null, 2);
+  }
+
+    async function api(path, method = "GET", body = null) {
+    const opt = {
+        method,
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+    };
+    if (body && method !== "GET") opt.body = JSON.stringify(body);
+
+    const res = await fetch(API_BASE + path, opt);
+
+    const text = await res.text();
+    let data;
+    try { data = text ? JSON.parse(text) : null; }
+    catch { data = { raw: text }; }
+
+    return { status: res.status, data };
+    }
+
+
+  // ---- Health + Me
+    async function api(path, method = "GET", body = null) {
+        const opt = {
+            method,
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+        };
+        if (body && method !== "GET") opt.body = JSON.stringify(body);
+
+        const res = await fetch(API_BASE + path, opt);
+
+        const text = await res.text();
+        let data;
+        try { data = text ? JSON.parse(text) : null; }
+        catch { data = { raw: text }; }
+
+        return { status: res.status, data };
+    }
+
+  // ---- Auth
+  async function authRegister() {
+    const body = {
+      email: document.getElementById("reg_email").value,
+      mat_khau: document.getElementById("reg_pass").value,
+      ho_ten: document.getElementById("reg_name").value
+    };
+    const r = await api("/api/auth/dang-ky", "POST", body);
+    show(r); await authMe();
+  }
+
+  async function authLogin() {
+    const body = {
+      email: document.getElementById("login_email").value,
+      mat_khau: document.getElementById("login_pass").value
+    };
+    const r = await api("/api/auth/dang-nhap", "POST", body);
+    show(r); await authMe();
+  }
+
+  async function authLogout() {
+    const r = await api("/api/auth/dang-xuat", "POST", {});
+    show(r); await authMe();
+  }
+
+  // ---- Products (you will implement these endpoints)
+  async function productsList() {
+    const kw = encodeURIComponent(document.getElementById("kw").value || "");
+    const trang = encodeURIComponent(document.getElementById("page").value || "1");
+    const gioi_han = encodeURIComponent(document.getElementById("limit").value || "10");
+    const r = await api(`/api/san-pham?tu_khoa=${kw}&trang=${trang}&gioi_han=${gioi_han}`);
+    show(r);
+  }
+
+  async function productDetail() {
+    const id = document.getElementById("product_id").value;
+    const r = await api(`/api/san-pham/${id}`);
+    show(r);
+  }
+
+  // ---- Cart (you will implement these endpoints)
+  async function cartView() { show(await api("/api/gio-hang")); }
+
+  async function cartAdd() {
+    const body = {
+      san_pham_id: Number(document.getElementById("cart_product_id").value),
+      so_luong: Number(document.getElementById("cart_qty").value || 1),
+    };
+    show(await api("/api/gio-hang/them", "POST", body));
+  }
+
+  async function cartUpdate() {
+    const itemId = document.getElementById("cart_item_id").value;
+    const body = { so_luong: Number(document.getElementById("cart_item_qty").value || 1) };
+    show(await api(`/api/gio-hang/${itemId}`, "PATCH", body));
+  }
+
+  async function cartDelete() {
+    const itemId = document.getElementById("cart_item_id").value;
+    show(await api(`/api/gio-hang/${itemId}`, "DELETE", {}));
+  }
+
+  // ---- Checkout + Orders (you will implement these endpoints)
+  async function checkout() {
+    const body = {
+      nguoi_nhan: document.getElementById("ship_name").value,
+      sdt_nguoi_nhan: document.getElementById("ship_phone").value,
+      dia_chi_giao_hang: document.getElementById("ship_addr").value,
+      ghi_chu: document.getElementById("ship_note").value,
+    };
+    show(await api("/api/checkout", "POST", body));
+  }
+
+  async function ordersList() { show(await api("/api/don-hang")); }
+
+  async function orderDetail() {
+    const id = document.getElementById("order_id").value;
+    show(await api(`/api/don-hang/${id}`));
+  }
+
+  // ---- Admin (you will implement these endpoints)
+  async function adminProductsList() { show(await api("/api/admin/san-pham")); }
+
+  async function adminProductCreate() {
+    const body = {
+      ten_san_pham: document.getElementById("ap_name").value,
+      duong_dan: document.getElementById("ap_slug").value,
+      gia_ban: Number(document.getElementById("ap_price").value),
+      so_luong_ton: Number(document.getElementById("ap_stock").value),
+    };
+    show(await api("/api/admin/san-pham", "POST", body));
+  }
+
+  async function adminProductUpdate() {
+    const id = document.getElementById("ap_id").value;
+    const body = {
+      ten_san_pham: document.getElementById("ap_name").value,
+      duong_dan: document.getElementById("ap_slug").value,
+      gia_ban: Number(document.getElementById("ap_price").value),
+      so_luong_ton: Number(document.getElementById("ap_stock").value),
+    };
+    show(await api(`/api/admin/san-pham/${id}`, "PATCH", body));
+  }
+
+  async function adminProductDelete() {
+    const id = document.getElementById("ap_id").value;
+    show(await api(`/api/admin/san-pham/${id}`, "DELETE", {}));
+  }
+
+  async function adminOrdersList() { show(await api("/api/admin/don-hang")); }
+
+  async function adminOrderUpdateStatus() {
+    const id = document.getElementById("ao_id").value;
+    const body = { trang_thai: document.getElementById("ao_status").value };
+    show(await api(`/api/admin/don-hang/${id}/trang-thai`, "PATCH", body));
+  }
+
+  // Auto check auth state on load
+  authMe();
+
+  window.apiHealth = apiHealth;
+  window.authMe = authMe;
+  window.authRegister = authRegister;
+  window.authLogin = authLogin;
+  window.authLogout = authLogout;
+</script>
+</body>
+</html>

@@ -1,16 +1,21 @@
-# Online Clothing E-Commerce Website
+# Online Clothing E-Commerce Website — V1
+
+> **Branch guide**
+> | Branch | What it contains |
+> |--------|-----------------|
+> | `V0` | Original project snapshot — no encryption, no security hardening |
+> | **`V1`** ← you are here | Encryption code applied; **keys not included** — generate your own |
+> | `V2` | Fully ready-to-run — keys committed, 4 000 benchmark users pre-seeded |
 
 This project is an online clothing e-commerce website developed for the courses **Website Development** and **Introduction to Cybersecurity**.
-It allows users to browse fashion products, view product details, manage a shopping cart, and place orders through a simple and user-friendly interface.
 
-## Project Purpose
+## What V1 adds over V0
 
-This project is built to practice:
-
-- Full-stack web development
-- Database design and management
-- Building web APIs and integrating frontend-backend flows
-- Applying basic cybersecurity concepts in a web system
+- **AES-256-GCM field-level encryption** on all customer PII (name, phone, birthday, address, order recipient)
+- **RSA-2048 OAEP key wrapping** — the raw AES key is never stored in plain text
+- **bcrypt** password hashing, prepared statements (PDO), `htmlspecialchars` output escaping, `HttpOnly`/`SameSite` cookies
+- Scripts to generate your own keys (`scripts/generate_encryption_keys.php`) and optionally seed benchmark data (`scripts/seed_test_data.php`)
+- `.env` is **gitignored** on this branch — you must generate your own keys (see setup below)
 
 ## Features
 
@@ -18,67 +23,70 @@ This project is built to practice:
 - User profile management (personal info, address book, password update)
 - Product browsing, filtering, and product detail pages
 - Shopping cart and checkout flow
-- Order creation, tracking, and reorder/cancel request flows
+- Order creation, tracking, reorder/cancel request flows
 - Promotion/voucher support in checkout
 - Admin management area for products, categories, users, promotions, and orders
-- Session-based authentication with password hashing and basic secure cookie settings
 
 ## Technology Stack
 
-### Actual implementation in this repository
-
 - **Frontend:** HTML, CSS, JavaScript, PHP-rendered pages
 - **Backend:** PHP (custom MVC-style structure with controller/model routing)
-- **Database:** MySQL / MariaDB (SQL dump included in `database.sql`)
+- **Database:** MySQL / MariaDB
 - **Web server:** Apache (URL rewriting via `public/.htaccess`)
-- **Version control:** Git & GitHub
-
-### Course-oriented target stack (project proposal context)
-
-- Frontend: HTML, CSS, JavaScript
-- Backend: Python / Flask
-- Database: SQLite
-
-> Note: The repository you are viewing is currently implemented with **PHP + MySQL**, not Flask + SQLite.
 
 ## Project Structure
 
-- `public/` - API entrypoint (`index.php`) and rewrite rules
-- `app/` - backend logic (`controllers/`, `models/`, `routes.php`, `Database.php`)
-- `fe/` - customer-facing pages
-- `admin-main/` - admin dashboard and management pages
-- `images/` - product and UI image assets
-- `database.sql` - database schema and sample data
+- `public/` — API entrypoint (`index.php`) and rewrite rules
+- `app/` — backend logic (`controllers/`, `models/`, `routes.php`, `Database.php`)
+- `app/security/` — `EncryptionService`, `KeyManager`, `PiiFields`
+- `fe/` — customer-facing pages
+- `admin-main/` — admin dashboard and management pages
+- `images/` — product and UI image assets
+- `database.sql` — schema + real sample data (no benchmark seed records)
+- `scripts/` — key generation, data seeding, benchmarking tools
 
-## Getting Started (3 steps)
+## Getting Started
 
 ### 1) Prerequisites
 
-- XAMPP (or equivalent Apache + PHP + MySQL stack)
-- PHP 8.x recommended
-- MySQL/MariaDB running locally
+- XAMPP (or equivalent Apache + PHP + MySQL stack) with **PHP 8.x**
+- OpenSSL extension enabled in PHP (required for key generation)
 
 ### 2) Clone and place in htdocs
 
 ```bash
 cd /Applications/XAMPP/xamppfiles/htdocs        # macOS XAMPP
-git clone git@github.com:porukodo/ecom_clothes_web.git
+git clone -b V1 git@github.com:porukodo/ecom_clothes_web.git
 ```
 
-Then fix `.env` permissions so Apache can read the encryption keys:
+### 3) Generate encryption keys
+
+This creates `.env` with a fresh RSA-2048 key pair and a wrapped AES-256 key:
+
+```bash
+/Applications/XAMPP/xamppfiles/bin/php ecom_clothes_web/scripts/generate_encryption_keys.php
+```
+
+Then fix permissions so Apache can read the file:
 
 ```bash
 chmod 644 ecom_clothes_web/.env
 ```
 
-### 3) Import the database
+### 4) Import the database
 
 1. Start XAMPP (Apache + MySQL).
 2. Open phpMyAdmin at `http://localhost/phpmyadmin`.
 3. Create a new database named `ecom_clothes_web`.
 4. Click **Import** → select `database.sql` → click **Go**.
 
-That's it. The database dump already includes the V2 schema migrations, 4 000 benchmark users with encrypted PII, and 2 000 benchmark orders.
+### 5) (Optional) Seed benchmark data
+
+```bash
+/Applications/XAMPP/xamppfiles/bin/php ecom_clothes_web/scripts/seed_test_data.php
+```
+
+Inserts 4 000 users and 2 000 orders with encrypted PII for performance testing.
 
 ### Access the app
 
@@ -87,17 +95,8 @@ That's it. The database dump already includes the V2 schema migrations, 4 000 be
 | Frontend (shop) | `http://localhost/ecom_clothes_web/fe/` |
 | Admin panel | `http://localhost/ecom_clothes_web/admin-main/` |
 | API health check | `http://localhost/ecom_clothes_web/public/api/health` |
-| Benchmark report | `http://localhost/ecom_clothes_web/public/benchmark_report.html` |
 
 **Admin login:** `admin@gmail.com` / `123456789`
-
-### (Optional) Re-run the benchmark yourself
-
-```bash
-/Applications/XAMPP/xamppfiles/bin/php scripts/run_query_benchmark.php
-```
-
-This regenerates `public/benchmark_report.html` with fresh results from your machine.
 
 ### Default DB connection
 
@@ -110,34 +109,29 @@ If your local configuration is different, update `app/Database.php` and `admin-m
 
 ## Security Notes
 
-### Encryption (V2 — Introduction to Cybersecurity)
+### Encryption (V1 — Introduction to Cybersecurity)
 
 - Customer PII (name, phone, birthday, address) is encrypted at rest using **AES-256-GCM**
-- The AES data key is wrapped with **RSA-2048 OAEP** — only the encrypted key is stored in `.env`
-- Encryption is applied across three tiers: `nguoi_dung` (Tier A), `dia_chi` (Tier B), `don_hang` (Tier C)
-- See `app/security/` for the full implementation and `public/benchmark_report.html` for performance analysis
+- The AES data key is wrapped with **RSA-2048 OAEP** — only the encrypted key blob is stored in `.env`
+- Encryption is applied across three tiers:
+  - **Tier A** `nguoi_dung` — `ho_ten`, `so_dien_thoai`, `ngay_sinh`
+  - **Tier B** `dia_chi` — all six address fields
+  - **Tier C** `don_hang` — `nguoi_nhan`, `sdt_nguoi_nhan`, `dia_chi_giao_hang`
+- See `app/security/` for the full implementation
 
-> **Note on `.env`:** The `.env` file containing encryption keys is intentionally committed to this
-> repository so that classmates and lecturers can clone and run the project without generating their
-> own keys. **In a real production system, `.env` must never be committed** — it should be listed in
-> `.gitignore` and each deployment should generate its own key set via
-> `php scripts/generate_encryption_keys.php`.
+> **Why `.env` is not committed here:**  
+> On this branch, `.env` is gitignored as it should be in any real deployment.
+> Each environment generates its own key pair via `generate_encryption_keys.php`.
+> If you want a pre-keyed, clone-and-run version, switch to the **`V2`** branch.
 
 ### General web security
 
-- Passwords are stored as bcrypt hashes
-- Session cookies are configured with `HttpOnly` and `SameSite` options
-- Database access uses prepared statements (PDO) to prevent SQL injection
-- Output escaping (`htmlspecialchars`) on all user-supplied data rendered in admin panel
+- Passwords stored as bcrypt hashes
+- Session cookies with `HttpOnly` and `SameSite` options
+- Database access via PDO prepared statements (SQL injection protection)
+- Output escaping (`htmlspecialchars`) on all user-supplied data in the admin panel
 - Role-based separation between normal users and administrators
-- `.env` and `scripts/` directory blocked from web access via `.htaccess`
-
-## Future Improvements
-
-- Online payment integration
-- Product recommendation system
-- Admin dashboard UX and analytics improvements
-- Enhanced security features (CSRF protection, stricter validation, rate limiting, audit logs)
+- `.env` and `scripts/` blocked from web access via `.htaccess`
 
 ## Author
 

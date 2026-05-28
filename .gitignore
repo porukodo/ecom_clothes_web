@@ -3,10 +3,9 @@
 
 # XAMPP / PHP
 /vendor/
-# NOTE: .env is intentionally committed for this course project so that
-# classmates / lecturers can clone-and-run without generating their own keys.
-# In a real production system, .env MUST be in .gitignore.
-# .env
+# .env holds RSA/AES encryption keys — never commit these.
+# Copy .env.example → .env, then run: php scripts/generate_encryption_keys.php
+.env
 .env.generated
 *.pem
 

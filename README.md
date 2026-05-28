@@ -1,4 +1,11 @@
-# Online Clothing E-Commerce Website
+# Online Clothing E-Commerce Website — V2
+
+> **Branch guide**
+> | Branch | What it contains |
+> |--------|-----------------|
+> | `V0` | Original project snapshot — no encryption, no security hardening |
+> | `V1` | Encryption code applied; keys NOT included — generate your own |
+> | **`V2`** ← you are here | Fully ready-to-run — keys committed, 4 000 benchmark users pre-seeded |
 
 This project is an online clothing e-commerce website developed for the courses **Website Development** and **Introduction to Cybersecurity**.
 It allows users to browse fashion products, view product details, manage a shopping cart, and place orders through a simple and user-friendly interface.
@@ -45,10 +52,12 @@ This project is built to practice:
 
 - `public/` - API entrypoint (`index.php`) and rewrite rules
 - `app/` - backend logic (`controllers/`, `models/`, `routes.php`, `Database.php`)
+- `app/security/` - `EncryptionService`, `KeyManager`, `PiiFields`
 - `fe/` - customer-facing pages
 - `admin-main/` - admin dashboard and management pages
 - `images/` - product and UI image assets
-- `database.sql` - database schema and sample data
+- `database.sql` - complete schema + 4 000 benchmark users + 2 000 orders (all encrypted)
+- `scripts/` - key generation, data seeding, benchmarking tools
 
 ## Getting Started (3 steps)
 
@@ -78,7 +87,7 @@ chmod 644 ecom_clothes_web/.env
 3. Create a new database named `ecom_clothes_web`.
 4. Click **Import** → select `database.sql` → click **Go**.
 
-That's it. The database dump already includes the V2 schema migrations, 4 000 benchmark users with encrypted PII, and 2 000 benchmark orders.
+That's it. The database dump already includes the full schema, 4 000 benchmark users with AES-256-GCM encrypted PII, and 2 000 benchmark orders.
 
 ### Access the app
 
@@ -91,13 +100,15 @@ That's it. The database dump already includes the V2 schema migrations, 4 000 be
 
 **Admin login:** `admin@gmail.com` / `123456789`
 
-### (Optional) Re-run the benchmark yourself
+### (Optional) Re-run the benchmarks yourself
 
 ```bash
+# Query performance report (SQL overhead analysis)
 /Applications/XAMPP/xamppfiles/bin/php scripts/run_query_benchmark.php
-```
 
-This regenerates `public/benchmark_report.html` with fresh results from your machine.
+# Business-query comparison: V0 (plain) vs V2 (encrypted)
+/Applications/XAMPP/xamppfiles/bin/php scripts/benchmark_business_queries.php
+```
 
 ### Default DB connection
 
@@ -113,8 +124,11 @@ If your local configuration is different, update `app/Database.php` and `admin-m
 ### Encryption (V2 — Introduction to Cybersecurity)
 
 - Customer PII (name, phone, birthday, address) is encrypted at rest using **AES-256-GCM**
-- The AES data key is wrapped with **RSA-2048 OAEP** — only the encrypted key is stored in `.env`
-- Encryption is applied across three tiers: `nguoi_dung` (Tier A), `dia_chi` (Tier B), `don_hang` (Tier C)
+- The AES data key is wrapped with **RSA-2048 OAEP** — only the encrypted key blob is stored in `.env`
+- Encryption applied across three tiers:
+  - **Tier A** `nguoi_dung` — `ho_ten`, `so_dien_thoai`, `ngay_sinh`
+  - **Tier B** `dia_chi` — all six address fields
+  - **Tier C** `don_hang` — `nguoi_nhan`, `sdt_nguoi_nhan`, `dia_chi_giao_hang`
 - See `app/security/` for the full implementation and `public/benchmark_report.html` for performance analysis
 
 > **Note on `.env`:** The `.env` file containing encryption keys is intentionally committed to this
@@ -122,6 +136,8 @@ If your local configuration is different, update `app/Database.php` and `admin-m
 > own keys. **In a real production system, `.env` must never be committed** — it should be listed in
 > `.gitignore` and each deployment should generate its own key set via
 > `php scripts/generate_encryption_keys.php`.
+>
+> If you want a version without committed secrets (closer to production practice), use the **`V1`** branch.
 
 ### General web security
 

@@ -98,7 +98,7 @@ That's it. The database dump already includes the full schema, 4 000 benchmark u
 | API health check | `http://localhost/ecom_clothes_web/public/api/health` |
 | Benchmark report | `http://localhost/ecom_clothes_web/public/benchmark_report.html` |
 
-**Admin login:** `admin@gmail.com` / `123456789`
+**Admin login:** `admin@gmail.com` / `123456`
 
 ### (Optional) Re-run the benchmarks yourself
 

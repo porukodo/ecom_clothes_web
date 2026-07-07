@@ -11,7 +11,7 @@ session_set_cookie_params([
 
 session_start();
 
-$API_BASE = 'http://localhost/ecom_clothes_web/public';
+$API_BASE = '/public';
 
 // Lưu cookie session hiện tại để gửi cho API
 $cookieName = session_name();

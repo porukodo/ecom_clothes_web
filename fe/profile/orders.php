@@ -2,7 +2,7 @@
 // profile/orders.php - Trang quản lý đơn hàng
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-$API_BASE = 'http://localhost/ecom_clothes_web/public';
+$API_BASE = '/public';
 $cookie = session_name() . '=' . session_id();
 session_write_close();
 
@@ -101,7 +101,7 @@ $user = $data['nguoi_dung'];
         
         // 3. Chuẩn hóa đường dẫn tương đối từ API
         // API trả về: "ecom_clothes_web\/images\/hoodie\/hoodie-zip-street\/trang.png"
-        // Cần chuyển thành: "http://localhost/ecom_clothes_web/images/hoodie/hoodie-zip-street/trang.png"
+        // Cần chuyển thành: "/images/hoodie/hoodie-zip-street/trang.png"
         
         // Xử lý backslashes escape từ JSON
         let cleanUrl = dbUrl.replace(/\\\//g, '/');
@@ -115,7 +115,7 @@ $user = $data['nguoi_dung'];
         }
         
         // Tạo URL đầy đủ
-        const fullUrl = 'http://localhost/ecom_clothes_web' + cleanUrl;
+        const fullUrl = cleanUrl;
         console.log('[DEBUG] Full image URL:', fullUrl);
         return fullUrl;
     }

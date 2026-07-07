@@ -228,7 +228,7 @@
 </main>
 
 <script>
-const API_BASE = 'http://localhost/ecom_clothes_web/public';
+const API_BASE = '/public';
 
 function qs(name){
   return new URLSearchParams(window.location.search).get(name);

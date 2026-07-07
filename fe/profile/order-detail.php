@@ -2,7 +2,7 @@
 // profile/order-detail.php
 if (session_status() === PHP_SESSION_NONE) session_start();
 $order_id = (int)($_GET['id'] ?? 0);
-$API_BASE = 'http://localhost/ecom_clothes_web/public';
+$API_BASE = '/public';
 ?>
 
 <?php include '../header.php'; ?>

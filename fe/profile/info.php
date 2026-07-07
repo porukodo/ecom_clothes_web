@@ -2,7 +2,7 @@
 // profile/info.php - Trang thông tin cá nhân
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-$API_BASE = 'http://localhost/ecom_clothes_web/public';
+$API_BASE = '/public';
 $cookie = session_name() . '=' . session_id();
 session_write_close();
 

@@ -16,7 +16,7 @@
   const isLoggedIn = <?php echo isset($_SESSION['nguoi_dung_id']) ? 'true' : 'false'; ?>;
 
   // 2) API base
-  const API_BASE = 'http://localhost/ecom_clothes_web/public';
+  const API_BASE = '/public';
 
   // 3) State
   let cart = null; // { gio_hang_id, items, tam_tinh }
@@ -52,7 +52,7 @@
       }
       
       // Tạo URL đầy đủ: http://localhost + /ecom_clothes_web + /images/...
-      const fullUrl = 'http://localhost/ecom_clothes_web' + cleanUrl;
+      const fullUrl = cleanUrl;
       console.log('[DEBUG] Full image URL:', fullUrl);
       return fullUrl;
   }
@@ -302,7 +302,7 @@
     console.log('Normalized URL:', normalizeImageUrl(it.anh_dai_dien_url));
 
     // Và test trực tiếp URL
-    const testUrl = 'http://localhost/ecom_clothes_web/images/hoodie/hoodie-oversize-basic/den.png';
+    const testUrl = '/images/hoodie/hoodie-oversize-basic/den.png';
     console.log('Testing URL:', testUrl);
   }
 

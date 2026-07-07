@@ -187,7 +187,7 @@ include 'header.php';
 </main>
 
 <script>
-    const API_BASE = 'http://localhost/ecom_clothes_web/public';
+    const API_BASE = '/public';
     const MAX_BUY_PER_SKU = 10;
 
     function qs(name){ return new URLSearchParams(window.location.search).get(name); }
@@ -211,7 +211,7 @@ include 'header.php';
         u = u.replace(/\\\//g, '/');
         
         // Database trả về: "ecom_clothes_web/images/hoodie/hoodie-zip-street/trang.png"
-        // Cần chuyển thành: "http://localhost/ecom_clothes_web/images/hoodie/hoodie-zip-street/trang.png"
+        // Cần chuyển thành: "/images/hoodie/hoodie-zip-street/trang.png"
         
         // Loại bỏ "ecom_clothes_web/" nếu có ở đầu (vì sẽ thêm base URL)
         u = u.replace(/^ecom_clothes_web\//i, '');

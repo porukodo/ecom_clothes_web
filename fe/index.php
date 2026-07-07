@@ -31,16 +31,15 @@ function normalizeImagePath($path) {
     // 3. Xử lý backslashes escape từ JSON/database
     $path = str_replace('\\', '/', $path);
     
-    // 4. Loại bỏ "ecom_clothes_web/" nếu có ở đầu (sẽ thêm lại sau)
+    // 4. Loại bỏ "ecom_clothes_web/" nếu có ở đầu
     $path = preg_replace('/^ecom_clothes_web\//i', '', $path);
-    
+
     // 5. Đảm bảo có / ở đầu
     if (strpos($path, '/') !== 0) {
         $path = '/' . $path;
     }
-    
-    // 6. Tạo URL đầy đủ cho XAMPP
-    return 'http://localhost/ecom_clothes_web' . $path;
+
+    return $path;
 }
 
 // 1. TRUY VẤN BANNER (Lấy banner đang hiện mới nhất)
@@ -53,7 +52,7 @@ if ($banner && !empty($banner['image'])) {
     $banner_img = normalizeImagePath($banner['image']);
 } else {
     // Dùng banner mặc định với đường dẫn đầy đủ
-    $banner_img = 'http://localhost/ecom_clothes_web/images/banner1.jpg';
+    $banner_img = '/images/banner1.jpg';
 }
 $banner_content = $banner ? $banner['content'] : '';
 

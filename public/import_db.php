@@ -20,15 +20,34 @@ $conn->select_db($db_name);
 echo "Reading SQL file...\n";
 $sql = file_get_contents(__DIR__ . '/../database.sql');
 
+// Remove DELIMITER statements (MySQL CLI-only syntax)
+$sql = preg_replace('/DELIMITER\s+[^;\n]+;/i', '', $sql);
+$sql = preg_replace('/DELIMITER\s+;/i', '', $sql);
+
 echo "Executing SQL (this may take a minute)...\n";
-if ($conn->multi_query($sql)) {
-    $count = 0;
-    do {
+$count = 0;
+$errors = [];
+
+// Split by semicolon but be careful with quoted strings
+$statements = array_filter(array_map('trim', preg_split('/;(?=(?:[^\']*\'[^\']*\')*[^\'"]*$)/', $sql)));
+
+foreach ($statements as $statement) {
+    if (empty($statement)) continue;
+
+    if ($conn->query($statement) === false) {
+        $errors[] = "Error: " . $conn->error . "\n  Statement: " . substr($statement, 0, 100) . "...\n";
+    } else {
         $count++;
-    } while ($conn->next_result());
-    echo "✓ Database imported successfully! ({$count} statements executed)\n";
+    }
+}
+
+if (!empty($errors)) {
+    echo "⚠ Import completed with some errors:\n";
+    foreach ($errors as $error) {
+        echo $error;
+    }
 } else {
-    die("Error importing database: " . $conn->error . "\n");
+    echo "✓ Database imported successfully! ({$count} statements executed)\n";
 }
 
 $conn->close();

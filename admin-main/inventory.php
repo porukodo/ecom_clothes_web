@@ -110,7 +110,6 @@ if (!empty($skus)) {
         if (strpos($testUrl, '/') !== 0) {
             $testUrl = '/' . $testUrl;
         }
-        $testUrl = 'http://localhost' . $testUrl;
         echo "<!-- DEBUG: Generated URL: " . htmlspecialchars($testUrl) . " -->\n";
     }
 }

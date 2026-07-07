@@ -37,6 +37,20 @@ if ($project_file !== false
     return;
 }
 
+// Admin pages (admin-main/)
+if (str_starts_with($uri, '/admin-main')) {
+    $admin_root = realpath(__DIR__ . '/../admin-main');
+    $admin_path = ($uri === '/admin-main' || $uri === '/admin-main/') ? '/admin-main/index.php' : $uri;
+    $admin_file = realpath(__DIR__ . '/..' . $admin_path);
+    if ($admin_file !== false
+        && str_starts_with($admin_file, $admin_root . DIRECTORY_SEPARATOR)
+        && is_file($admin_file)) {
+        chdir(dirname($admin_file));
+        require $admin_file;
+        return;
+    }
+}
+
 // Everything else → frontend (fe/ folder)
 $fe_root = __DIR__ . '/../fe';
 $fe_file = $fe_root . ($uri === '/' ? '/index.php' : $uri);

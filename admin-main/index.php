@@ -151,7 +151,7 @@ if ($period === 'month') {
 function getProductImageUrl($dbPath) {
     // Nếu rỗng, trả về ảnh mặc định
     if (empty($dbPath)) {
-        return 'assets/images/no-image.png';
+        return 'https://placehold.co/80x80?text=No+Image';
     }
     
     // Nếu $dbPath là số (ID), cần truy vấn lại URL thật (hoặc xử lý ở SQL như bước 1)

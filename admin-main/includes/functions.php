@@ -139,10 +139,10 @@ function normalizeImageUrl($dbUrl) {
         $cleanUrl = '/' . $cleanUrl;
     }
     
-    // Tạo URL đầy đủ với localhost
-    $fullUrl = 'http://localhost' . $cleanUrl;
-    
-    return $fullUrl;
+    // Trả về đường dẫn tương đối (hoạt động cả local lẫn production)
+    $cleanUrl = preg_replace('#^/ecom_clothes_web#i', '', $cleanUrl);
+
+    return $cleanUrl;
 }
 
 /**

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Báo cáo Nghiệp vụ — V0 vs V2</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+  body        { background: #f1f5f9; }
+  .hero       { background: linear-gradient(135deg, #0f4c3a 0%, #10b981 100%);
+                color: #fff; padding: 3rem 0 2.5rem; }
+  .hero small { opacity: .75; }
+  .stat-card  { border: none; border-radius: .75rem; box-shadow: 0 1px 6px rgba(0,0,0,.08); }
+  .section    { border: none; border-radius: .75rem; box-shadow: 0 1px 6px rgba(0,0,0,.08);
+                margin-bottom: 2rem; }
+  .conclusion { border-left: 5px solid #10b981; background: #fff; border-radius: .75rem;
+                box-shadow: 0 1px 6px rgba(0,0,0,.08); }
+  th, td      { vertical-align: middle !important; }
+  .nav-link-report { color: rgba(255,255,255,.8); text-decoration: underline; }
+  .nav-link-report:hover { color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="hero text-center">
+  <div class="container">
+    <h1 class="fw-bold display-5 mb-2">Báo cáo So sánh Nghiệp vụ V0 vs V2</h1>
+    <p class="lead mb-1">10 kịch bản thực tế — Plain SQL (V0) vs AES-256-GCM Encryption (V2)</p>
+    <small>Thực hiện: 08/06/2026 08:23:03 &nbsp;|&nbsp; Mã hóa: BẬT — AES-256-GCM + RSA-2048 &nbsp;|&nbsp; 300 lần lặp</small>
+    <br><br>
+    <a href="benchmark_report.html" class="nav-link-report">← Xem báo cáo SQL Overhead (Script 1)</a>
+  </div>
+</div>
+
+<div class="container py-5">
+
+<div class="row g-3 mb-5">
+  <div class="col-6 col-md-3">
+    <div class="card stat-card text-center p-3">
+      <div class="display-6 fw-bold text-primary">10</div>
+      <div class="text-secondary small">Kịch bản nghiệp vụ</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card text-center p-3">
+      <div class="display-6 fw-bold text-success">300</div>
+      <div class="text-secondary small">Lần lặp / kịch bản</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card text-center p-3">
+      <div class="display-6 fw-bold text-warning">28.5%</div>
+      <div class="text-secondary small">Overhead TB (có PII)</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card text-center p-3">
+      <div class="display-6 fw-bold text-danger">30</div>
+      <div class="text-secondary small">Warmup mỗi kịch bản</div>
+    </div>
+  </div>
+</div>
+
+<div class="card section">
+  <div class="card-header bg-white border-0 pt-4 pb-2 px-4">
+    <h5 class="fw-bold mb-0">Thời gian Trung bình mỗi Kịch bản (ms)</h5>
+    <p class="text-secondary small mb-0">So sánh V0 (plain) vs V2 (AES-256-GCM) trên 10 luồng nghiệp vụ thực tế</p>
+  </div>
+  <div class="card-body p-4">
+    <canvas id="chartBiz" height="120"></canvas>
+  </div>
+</div>
+
+<div class="card section">
+  <div class="card-header bg-white border-0 pt-4 pb-2 px-4">
+    <h5 class="fw-bold mb-0">Bảng So sánh Chi tiết (ms)</h5>
+    <p class="text-secondary small mb-0">Tất cả giá trị đơn vị milli-giây — 300 lần lặp, 30 warmup</p>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-bordered table-sm mb-0" style="font-size:.85rem">
+        <thead class="table-dark">
+          <tr>
+            <th>Kịch bản</th><th>Tier</th>
+            <th>V0 mean</th><th>V0 med</th><th>V0 p95</th>
+            <th>V2 mean</th><th>V2 med</th><th>V2 p95</th>
+            <th>Overhead</th>
+          </tr>
+        </thead>
+        <tbody>
+    <tr style='background:#fffbeb'>
+      <td class='fw-semibold'>Login: find user by email</td>
+      <td><span class='badge bg-secondary'>Auth</span></td>
+      <td>0.1738</td>
+      <td>0.1427</td>
+      <td>0.3558</td>
+      <td>0.3069</td>
+      <td>0.15</td>
+      <td>0.6428</td>
+      <td class='text-center'><span class='badge' style='background:#f59e0b'>76.5%</span><br><small class='text-muted'>+0.133 ms</small></td>
+    </tr>
+    <tr style='background:#f0fdf4'>
+      <td class='fw-semibold'>Profile: load user by ID</td>
+      <td><span class='badge bg-secondary'>Customer</span></td>
+      <td>0.1594</td>
+      <td>0.1378</td>
+      <td>0.2476</td>
+      <td>0.1386</td>
+      <td>0.1353</td>
+      <td>0.1572</td>
+      <td class='text-center'><span class='badge' style='background:#22c55e'>-13%</span><br><small class='text-muted'>+-0.0208 ms</small></td>
+    </tr>
+    <tr style='background:#f0fdf4'>
+      <td class='fw-semibold'>Address book: list by user</td>
+      <td><span class='badge bg-secondary'>Customer</span></td>
+      <td>0.1514</td>
+      <td>0.1419</td>
+      <td>0.212</td>
+      <td>0.1487</td>
+      <td>0.1456</td>
+      <td>0.1691</td>
+      <td class='text-center'><span class='badge' style='background:#22c55e'>-1.8%</span><br><small class='text-muted'>+-0.0027 ms</small></td>
+    </tr>
+    <tr style='background:#ffffff'>
+      <td class='fw-semibold'>Shop: paginated product list</td>
+      <td><span class='badge bg-secondary'>Catalog</span></td>
+      <td>0.1467</td>
+      <td>0.1333</td>
+      <td>0.2228</td>
+      <td>0.1498</td>
+      <td>0.1378</td>
+      <td>0.2137</td>
+      <td class='text-center'><span class="text-muted">—</span></td>
+    </tr>
+    <tr style='background:#ffffff'>
+      <td class='fw-semibold'>Product detail: fetch with SKUs</td>
+      <td><span class='badge bg-secondary'>Catalog</span></td>
+      <td>0.577</td>
+      <td>0.433</td>
+      <td>0.5596</td>
+      <td>0.4371</td>
+      <td>0.432</td>
+      <td>0.4777</td>
+      <td class='text-center'><span class="text-muted">—</span></td>
+    </tr>
+    <tr style='background:#ffffff'>
+      <td class='fw-semibold'>Cart: load items for user</td>
+      <td><span class='badge bg-secondary'>Cart</span></td>
+      <td>0.3555</td>
+      <td>0.3503</td>
+      <td>0.3931</td>
+      <td>0.3464</td>
+      <td>0.3435</td>
+      <td>0.3729</td>
+      <td class='text-center'><span class="text-muted">—</span></td>
+    </tr>
+    <tr style='background:#f0fdf4'>
+      <td class='fw-semibold'>My Orders: list for user</td>
+      <td><span class='badge bg-secondary'>Order</span></td>
+      <td>0.162</td>
+      <td>0.1565</td>
+      <td>0.185</td>
+      <td>0.1676</td>
+      <td>0.1675</td>
+      <td>0.1815</td>
+      <td class='text-center'><span class='badge' style='background:#22c55e'>3.4%</span><br><small class='text-muted'>+0.0056 ms</small></td>
+    </tr>
+    <tr style='background:#f0fdf4'>
+      <td class='fw-semibold'>Order detail: single order + items</td>
+      <td><span class='badge bg-secondary'>Order</span></td>
+      <td>0.4642</td>
+      <td>0.4583</td>
+      <td>0.533</td>
+      <td>0.4602</td>
+      <td>0.4613</td>
+      <td>0.4942</td>
+      <td class='text-center'><span class='badge' style='background:#22c55e'>-0.9%</span><br><small class='text-muted'>+-0.004 ms</small></td>
+    </tr>
+    <tr style='background:#fffbeb'>
+      <td class='fw-semibold'>Admin: paginated user list (20/page)</td>
+      <td><span class='badge bg-secondary'>Admin</span></td>
+      <td>0.1607</td>
+      <td>0.1548</td>
+      <td>0.1763</td>
+      <td>0.2829</td>
+      <td>0.2776</td>
+      <td>0.3071</td>
+      <td class='text-center'><span class='badge' style='background:#f59e0b'>76.1%</span><br><small class='text-muted'>+0.1222 ms</small></td>
+    </tr>
+    <tr style='background:#fffbeb'>
+      <td class='fw-semibold'>Admin: paginated order list (20/page)</td>
+      <td><span class='badge bg-secondary'>Admin</span></td>
+      <td>0.2016</td>
+      <td>0.1992</td>
+      <td>0.2183</td>
+      <td>0.3215</td>
+      <td>0.3196</td>
+      <td>0.3358</td>
+      <td class='text-center'><span class='badge' style='background:#f59e0b'>59.5%</span><br><small class='text-muted'>+0.1199 ms</small></td>
+    </tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card conclusion p-4 mb-4">
+  <h4 class="fw-bold" style="color:#10b981">Kết luận</h4>
+  
+<p>Qua kết quả benchmark <strong>10 kịch bản nghiệp vụ thực tế</strong> với
+<strong>300 lần lặp</strong> mỗi kịch bản:</p>
+<ol class='mt-3'>
+  <li class='mb-2'>
+    <strong>Overhead trung bình cho các truy vấn có PII là 28.5%</strong> —
+    đây là chi phí thực tế mà người dùng cuối cảm nhận được khi hệ thống bật mã hóa.
+  </li>
+  <li class='mb-2'>
+    <strong>Các trang không chứa PII</strong> (Shop, Chi tiết sản phẩm, Giỏ hàng) — hoàn toàn
+    <strong>không bị ảnh hưởng</strong> bởi lớp mã hóa vì không có trường nào cần giải mã.
+  </li>
+  <li class='mb-2'>
+    <strong>Trang Admin</strong> (danh sách người dùng, danh sách đơn hàng) có overhead cao hơn
+    vì phải giải mã nhiều hàng cùng lúc (20 hàng × 2–3 trường PII mỗi hàng).
+  </li>
+</ol>
+<p class='mt-3 mb-0'>
+  <strong>Kết luận:</strong> Mã hóa AES-256-GCM hoạt động trong giới hạn chấp nhận được cho
+  mọi luồng nghiệp vụ. Người dùng cuối hầu như không nhận thấy sự khác biệt.
+</p>
+
+</div>
+
+<p class="text-center text-muted small pb-4">
+  Báo cáo được sinh tự động bởi <code>scripts/benchmark_business_queries.php</code>
+  &nbsp;·&nbsp; <a href="benchmark_report.html">Xem báo cáo SQL Overhead →</a>
+</p>
+
+</div>
+
+<script>
+const LABELS = ["Login: find user by email","Profile: load user by ID","Address book: list by user","Shop: paginated product list","Product detail: fetch with SKUs","Cart: load items for user","My Orders: list for user","Order detail: single order + items","Admin: paginated user list (20\/page)","Admin: paginated order list (20\/page)"];
+const V0_DATA = [0.173800000000000010036416142611415125429630279541015625,0.1593999999999999861444166526780463755130767822265625,0.1514000000000000067945649107059580273926258087158203125,0.146699999999999997069011214989586733281612396240234375,0.5769999999999999573674358543939888477325439453125,0.355499999999999982680520815847557969391345977783203125,0.1620000000000000051070259132757200859487056732177734375,0.464200000000000001509903313490212894976139068603515625,0.160700000000000009503509090791339986026287078857421875,0.20160000000000000142108547152020037174224853515625];
+const V2_DATA = [0.306900000000000006128431095930864103138446807861328125,0.138600000000000000976996261670137755572795867919921875,0.148699999999999998845368054389837197959423065185546875,0.149799999999999988720134069808409549295902252197265625,0.437099999999999988542498385868384502828121185302734375,0.346399999999999985700327442827983759343624114990234375,0.1675999999999999989785948173448559828102588653564453125,0.460199999999999997957189634689711965620517730712890625,0.282899999999999984812149023127858527004718780517578125,0.32150000000000000799360577730112709105014801025390625];
+
+new Chart(document.getElementById('chartBiz'), {
+  type: 'bar',
+  data: {
+    labels: LABELS,
+    datasets: [
+      {
+        label: 'V0 — Plain (không mã hóa)',
+        data: V0_DATA,
+        backgroundColor: 'rgba(37,99,235,.75)',
+        borderColor: 'rgba(37,99,235,1)',
+        borderWidth: 1,
+        borderRadius: 4,
+      },
+      {
+        label: 'V2 — AES-256-GCM',
+        data: V2_DATA,
+        backgroundColor: 'rgba(239,68,68,.75)',
+        borderColor: 'rgba(239,68,68,1)',
+        borderWidth: 1,
+        borderRadius: 4,
+      },
+    ],
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    plugins: {
+      legend: { position: 'top' },
+      tooltip: {
+        callbacks: {
+          label: ctx => ' ' + ctx.dataset.label + ': ' + ctx.parsed.x.toFixed(4) + ' ms',
+        },
+      },
+    },
+    scales: {
+      x: {
+        beginAtZero: true,
+        title: { display: true, text: 'Thời gian (ms)' },
+        ticks: { callback: v => v.toFixed(2) + ' ms' },
+      },
+      y: { ticks: { font: { size: 11 } } },
+    },
+  },
+});
+</script>
+</body>
+</html>

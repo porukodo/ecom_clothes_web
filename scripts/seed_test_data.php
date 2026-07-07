@@ -70,10 +70,26 @@ $hashPass = password_hash('Benchmark@2025', PASSWORD_BCRYPT);
 $total    = 4_000;
 $t0       = microtime(true);
 
+// Spread benchmark activity over the last ~6 months (ending now) instead of
+// freezing everything at "the moment this script ran" — that frozen instant
+// quickly drops out of the admin dashboard's "this month"/"this year" filters.
+$activityWindowDays = 180;
+
 function enc(string $v): string
 {
     global $useEnc;
     return $useEnc ? (EncryptionService::encrypt($v) ?? $v) : $v;
+}
+
+function randomRecentDateTime(int $maxDaysAgo): string
+{
+    return date('Y-m-d H:i:s', time() - random_int(0, $maxDaysAgo * 86400));
+}
+
+function randomDateTimeAfter(string $from): string
+{
+    $base = strtotime($from);
+    return date('Y-m-d H:i:s', min(time(), $base + random_int(0, 4 * 86400)));
 }
 
 echo "━━━ Seeding {$total} benchmark users ";
@@ -90,11 +106,14 @@ for ($i = 1; $i <= $total; $i++) {
     $dob   = sprintf('%04d-%02d-%02d',
                  random_int(1970, 2004), random_int(1, 12), random_int(1, 28));
 
+    $created = randomRecentDateTime($activityWindowDays);
+    $updated = randomDateTimeAfter($created);
+
     $pdo->prepare("
         INSERT INTO nguoi_dung
-            (email, mat_khau_bam, ho_ten, so_dien_thoai, ngay_sinh, vai_tro, trang_thai)
-        VALUES (?, ?, ?, ?, ?, 'NGUOI_DUNG', 'HOAT_DONG')
-    ")->execute(["bm{$i}@bench.local", $hashPass, enc($hoTen), enc($phone), enc($dob)]);
+            (email, mat_khau_bam, ho_ten, so_dien_thoai, ngay_sinh, vai_tro, trang_thai, tao_luc, cap_nhat_luc)
+        VALUES (?, ?, ?, ?, ?, 'NGUOI_DUNG', 'HOAT_DONG', ?, ?)
+    ")->execute(["bm{$i}@bench.local", $hashPass, enc($hoTen), enc($phone), enc($dob), $created, $updated]);
 
     $uid       = (int) $pdo->lastInsertId();
     $userIds[] = $uid;
@@ -119,18 +138,26 @@ for ($i = 1; $i <= $total; $i++) {
 }
 $pdo->commit();
 
-// ── Orders ───────────────────────────────────────────────────────────────────
-$orders = 2_000;
-echo "Seeding {$orders} benchmark orders...\n";
+// ── Orders + line items ──────────────────────────────────────────────────────
+$orders   = 2_000;
+$products = $pdo->query("SELECT id, ten_san_pham, gia_ban FROM san_pham")->fetchAll();
+
+echo "Seeding {$orders} benchmark orders (with line items)...\n";
 $pdo->beginTransaction();
+
+$lineItemStmt = $pdo->prepare("
+    INSERT INTO chi_tiet_don_hang
+        (don_hang_id, san_pham_id, ten_san_pham, don_gia, so_luong, thanh_tien, tao_luc)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+");
 
 for ($i = 1; $i <= $orders; $i++) {
     $uid     = $userIds[array_rand($userIds)];
     $ma      = 'BENCH-' . str_pad((string) $i, 6, '0', STR_PAD_LEFT);
     $stat    = $stats[array_rand($stats)];
-    $subtotal = random_int(100, 5_000) * 1_000;
+    $created = randomRecentDateTime($activityWindowDays);
+    $updated = randomDateTimeAfter($created);
     $ship    = 30_000;
-    $total_p = $subtotal + $ship;
 
     // Tier C PII fields on don_hang are also encrypted (PiiFields::ORDER)
     $tenNhan = enc($ho[array_rand($ho)] . ' ' . $dem[array_rand($dem)] . ' ' . $ten[array_rand($ten)]);
@@ -143,13 +170,35 @@ for ($i = 1; $i <= $orders; $i++) {
         INSERT INTO don_hang
             (ma_don_hang, nguoi_dung_id, trang_thai, phuong_thuc_thanh_toan,
              trang_thai_thanh_toan, tam_tinh, phi_van_chuyen, giam_gia, tong_tien,
-             nguoi_nhan, sdt_nguoi_nhan, dia_chi_giao_hang)
-        VALUES (?, ?, ?, 'COD', 'CHUA_THANH_TOAN', ?, ?, 0, ?, ?, ?, ?)
-    ")->execute([$ma, $uid, $stat, $subtotal, $ship, $total_p,
-                 $tenNhan, $sdtNhan, $dcgh]);
+             nguoi_nhan, sdt_nguoi_nhan, dia_chi_giao_hang, tao_luc, cap_nhat_luc)
+        VALUES (?, ?, ?, 'COD', 'CHUA_THANH_TOAN', 0, ?, 0, 0, ?, ?, ?, ?, ?)
+    ")->execute([$ma, $uid, $stat, $ship, $tenNhan, $sdtNhan, $dcgh, $created, $updated]);
+
+    $orderId = (int) $pdo->lastInsertId();
+
+    // 1-3 line items per order, drawn from the real product catalog
+    $lineCount = random_int(1, 3);
+    $picks     = (array) array_rand($products, min($lineCount, count($products)));
+    $subtotal  = 0;
+
+    foreach ($picks as $p) {
+        $product   = $products[$p];
+        $qty       = random_int(1, 3);
+        $lineTotal = (int) $product['gia_ban'] * $qty;
+        $subtotal += $lineTotal;
+
+        $lineItemStmt->execute([
+            $orderId, $product['id'], $product['ten_san_pham'],
+            $product['gia_ban'], $qty, $lineTotal, $created,
+        ]);
+    }
+
+    $pdo->prepare("UPDATE don_hang SET tam_tinh = ?, tong_tien = ? WHERE id = ?")
+        ->execute([$subtotal, $subtotal + $ship, $orderId]);
 
     if ($i % 500 === 0) {
         $pdo->commit();
+        printf("  [%4d / %4d] %.1fs\n", $i, $orders, microtime(true) - $t0);
         $pdo->beginTransaction();
     }
 }

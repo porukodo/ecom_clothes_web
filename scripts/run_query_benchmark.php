@@ -416,6 +416,8 @@ $html = <<<HTML
     <h1 class="fw-bold display-5 mb-2">Báo cáo Hiệu năng Truy vấn CSDL</h1>
     <p class="lead mb-1">Hệ thống Thương mại điện tử — Phân tích overhead khi áp dụng mã hóa AES-256-GCM + RSA-2048</p>
     <small>Thực hiện: {$runDate} &nbsp;|&nbsp; Mã hóa: {$encLabel}</small>
+    <br><br>
+    <a href="benchmark_business_report.html" style="color:rgba(255,255,255,.8);text-decoration:underline;">Xem báo cáo So sánh Nghiệp vụ V0 vs V2 (Script 2) →</a>
   </div>
 </div>
 

@@ -7,12 +7,8 @@ mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 include 'header.php'; 
 
 // --- KẾT NỐI DATABASE ---
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "ecom_clothes_web";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
+require_once __DIR__ . '/db.php';
+$conn = new mysqli($db_host, $db_user, $db_pass, $db_name, $db_port);
 
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);

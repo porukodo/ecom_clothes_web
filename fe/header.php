@@ -17,7 +17,8 @@ if (session_status() === PHP_SESSION_NONE) {
 // 2. Logic lấy số lượng giỏ hàng (Giữ nguyên logic SQL)
 $cart_count = 0;
 if (isset($_SESSION['nguoi_dung_id'])) {
-    $conn_header = new mysqli("localhost", "root", "", "ecom_clothes_web");
+    require_once __DIR__ . '/db.php';
+    $conn_header = new mysqli($db_host, $db_user, $db_pass, $db_name, $db_port);
     if (!$conn_header->connect_error) {
         $uid = (int)$_SESSION['nguoi_dung_id'];
         $sql_count = "SELECT SUM(ct.so_luong) as total 

@@ -31,17 +31,20 @@ $skip_block = false;
 foreach ($lines as $line) {
     $trimmed = trim($line);
 
-    // Skip DELIMITER lines and comment-only lines
-    if (str_starts_with($trimmed, 'DELIMITER') ||
-        str_starts_with($trimmed, '--') ||
-        str_starts_with($trimmed, '/*!') ||
-        $trimmed === '') {
+    // Skip empty lines and pure comment lines
+    if ($trimmed === '' || str_starts_with($trimmed, '--')) {
         continue;
     }
 
-    // Skip trigger/procedure/function blocks (complex to handle)
-    if (preg_match('/^(CREATE.*TRIGGER|CREATE.*PROCEDURE|CREATE.*FUNCTION|CREATE.*EVENT)/i', $trimmed)) {
+    // Check for trigger/procedure/function in /*!...*/ lines too
+    if (preg_match('/(TRIGGER|PROCEDURE|FUNCTION|EVENT)/i', $trimmed) &&
+        (str_starts_with($trimmed, '/*!') || preg_match('/^(CREATE.*TRIGGER|CREATE.*PROCEDURE|CREATE.*FUNCTION|CREATE.*EVENT)/i', $trimmed))) {
         $skip_block = true;
+    }
+
+    // Skip DELIMITER lines
+    if (str_starts_with($trimmed, 'DELIMITER')) {
+        continue;
     }
 
     if ($skip_block) {
@@ -49,6 +52,12 @@ foreach ($lines as $line) {
             $skip_block = false;
             $skipped++;
         }
+        $statement = '';
+        continue;
+    }
+
+    // Skip pure /*!...*/ lines (MySQL version comments)
+    if (preg_match('/^\/\*!.*\*\/\s*$/', $trimmed)) {
         continue;
     }
 

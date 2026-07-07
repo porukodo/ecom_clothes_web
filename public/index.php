@@ -56,9 +56,11 @@ $method = $_SERVER['REQUEST_METHOD'];
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 // Handle both local dev (/ecom_clothes_web/public) and production (root) deployments
-$prefix = '/ecom_clothes_web/public';
-if (str_starts_with($path, $prefix)) {
-  $path = substr($path, strlen($prefix));
+foreach (['/ecom_clothes_web/public', '/public'] as $prefix) {
+  if (str_starts_with($path, $prefix . '/')) {
+    $path = substr($path, strlen($prefix));
+    break;
+  }
 }
 $path = $path ?: '/';
 

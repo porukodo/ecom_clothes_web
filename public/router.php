@@ -4,7 +4,8 @@
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 // API routes → backend (public/index.php)
-if (str_starts_with($uri, '/api/')) {
+// Frontend calls use the local-dev prefix /public/api/..., accept both
+if (str_starts_with($uri, '/api/') || str_starts_with($uri, '/public/api/')) {
     require __DIR__ . '/index.php';
     return;
 }

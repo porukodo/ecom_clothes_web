@@ -8,10 +8,11 @@ while ($row = $result->fetch_row()) {
     $cols = $conn->query("SHOW COLUMNS FROM `{$table}` WHERE Type LIKE '%varchar%' OR Type LIKE '%text%'");
     while ($col = $cols->fetch_assoc()) {
         $colName = $col['Field'];
-        $check = $conn->query("SELECT COUNT(*) as c FROM `{$table}` WHERE `{$colName}` LIKE '/ecom_clothes_web/%'");
+        // Fix any remaining localhost URLs
+        $check = $conn->query("SELECT COUNT(*) as c FROM `{$table}` WHERE `{$colName}` LIKE '%localhost%'");
         $count = $check->fetch_assoc()['c'];
         if ($count > 0) {
-            $conn->query("UPDATE `{$table}` SET `{$colName}` = REPLACE(`{$colName}`, '/ecom_clothes_web', '') WHERE `{$colName}` LIKE '/ecom_clothes_web/%'");
+            $conn->query("UPDATE `{$table}` SET `{$colName}` = REGEXP_REPLACE(`{$colName}`, 'https?://localhost/ecom_clothes_web', '') WHERE `{$colName}` LIKE '%localhost%'");
             echo "✓ Fixed {$table}.{$colName}: {$conn->affected_rows} rows\n";
         }
     }

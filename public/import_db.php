@@ -20,37 +20,43 @@ $conn->select_db($db_name);
 echo "Reading SQL file...\n";
 $sql = file_get_contents(__DIR__ . '/../database.sql');
 
-// Remove DELIMITER statements
+// Remove DELIMITER lines and MySQL version-specific syntax
 $sql = preg_replace('/^\s*DELIMITER\s+[^\n]*\n/m', '', $sql);
+$sql = preg_replace('/\/\*!\d+\s+/m', '', $sql);  // Remove /*!50003 style comments
+$sql = preg_replace('/\s+\*\//m', ' ', $sql);      // Remove closing */
 
 echo "Executing SQL (this may take a minute)...\n";
 $count = 0;
 $errors = [];
+$skipped = 0;
 
-// Simple split by semicolon
+// Split by semicolon
 $statements = explode(';', $sql);
 
 foreach ($statements as $statement) {
     $statement = trim($statement);
-    if (empty($statement)) continue;
 
+    // Skip empty statements or comment-only lines
+    if (empty($statement) || preg_match('/^\s*\/\*.*\*\/\s*$/', $statement)) {
+        $skipped++;
+        continue;
+    }
+
+    // Execute statement
     if ($conn->query($statement) === false) {
-        $errors[] = "Error: " . $conn->error;
+        $errors[] = $conn->error;
     } else {
         $count++;
     }
 }
 
 if (!empty($errors)) {
-    echo "⚠ Import completed with " . count($errors) . " error(s):\n";
-    foreach (array_slice($errors, 0, 5) as $error) {
+    echo "⚠ Import completed with " . count($errors) . " error(s), " . $count . " successful, " . $skipped . " skipped\n";
+    foreach (array_slice($errors, 0, 3) as $error) {
         echo "  - $error\n";
     }
-    if (count($errors) > 5) {
-        echo "  ... and " . (count($errors) - 5) . " more\n";
-    }
 } else {
-    echo "✓ Database imported successfully! ({$count} statements executed)\n";
+    echo "✓ Database imported successfully! ({$count} statements executed, {$skipped} skipped)\n";
 }
 
 $conn->close();

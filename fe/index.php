@@ -8,11 +8,7 @@ include 'header.php';
 
 // --- KẾT NỐI DATABASE ---
 require_once __DIR__ . '/db.php';
-$conn = new mysqli($db_host, $db_user, $db_pass, $db_name, $db_port);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+$conn = db_connect($db_host, $db_user, $db_pass, $db_name, $db_port);
 
 // ====== THÊM HÀM CHUẨN HÓA ẢNH ======
 function normalizeImagePath($path) {

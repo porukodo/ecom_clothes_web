@@ -18,7 +18,7 @@ if (session_status() === PHP_SESSION_NONE) {
 $cart_count = 0;
 if (isset($_SESSION['nguoi_dung_id'])) {
     require_once __DIR__ . '/db.php';
-    $conn_header = new mysqli($db_host, $db_user, $db_pass, $db_name, $db_port);
+    $conn_header = db_connect($db_host, $db_user, $db_pass, $db_name, $db_port);
     if (!$conn_header->connect_error) {
         $uid = (int)$_SESSION['nguoi_dung_id'];
         $sql_count = "SELECT SUM(ct.so_luong) as total 

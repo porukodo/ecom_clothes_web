@@ -7,12 +7,12 @@ final class Database {
   public static function pdo(): \PDO {
     if (self::$pdo) return self::$pdo;
 
-    // Config cứng cho XAMPP local (MVP)
-    $host = '127.0.0.1';
-    $db   = 'ecom_clothes_web';
-    $user = 'root';
-    $pass = '';        
-    $port = 3306;
+    // Đọc từ env (Railway/production), fallback về config XAMPP local
+    $host = getenv('DB_HOST') ?: ($_ENV['DB_HOST'] ?? '127.0.0.1');
+    $db   = getenv('DB_NAME') ?: ($_ENV['DB_NAME'] ?? 'ecom_clothes_web');
+    $user = getenv('DB_USER') ?: ($_ENV['DB_USER'] ?? 'root');
+    $pass = getenv('DB_PASSWORD') ?: getenv('DB_PASS') ?: ($_ENV['DB_PASSWORD'] ?? $_ENV['DB_PASS'] ?? '');
+    $port = (int)(getenv('DB_PORT') ?: ($_ENV['DB_PORT'] ?? 3306));
 
     $dsn = "mysql:host={$host};port={$port};dbname={$db};charset=utf8mb4";
 
@@ -25,6 +25,8 @@ final class Database {
     ];
 
     self::$pdo = new \PDO($dsn, $user, $pass, $options);
+    // Tương thích Railway MySQL — tắt strict GROUP BY như XAMPP local
+    self::$pdo->exec("SET SESSION sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
     return self::$pdo;
   }
 }

@@ -50,6 +50,10 @@ final class Env
                 $value = str_replace(['\\n', '\\r'], ["\n", "\r"], $value);
             }
 
+            // Real environment variables (e.g. Railway) take precedence over .env
+            if (getenv($name) !== false) {
+                continue;
+            }
             $_ENV[$name] = $value;
         }
 

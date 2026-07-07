@@ -24,9 +24,7 @@ echo "Executing SQL (this may take a minute)...\n";
 if ($conn->multi_query($sql)) {
     $count = 0;
     do {
-        if ($conn->query_result === true) {
-            $count++;
-        }
+        $count++;
     } while ($conn->next_result());
     echo "✓ Database imported successfully! ({$count} statements executed)\n";
 } else {

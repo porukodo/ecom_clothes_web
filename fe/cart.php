@@ -44,7 +44,8 @@
       
       // 4. Chuẩn hóa đường dẫn tương đối từ database
       // Loại bỏ 'ecom_clothes_web/' nếu có ở đầu
-      let cleanUrl = dbUrl.replace(/^ecom_clothes_web\//i, '');
+      let cleanUrl = dbUrl.replace(/^https?:\/\/localhost(\/ecom_clothes_web)?\//i, '')
+                          .replace(/^ecom_clothes_web\//i, '');
       
       // Đảm bảo có dấu / ở đầu
       if (!cleanUrl.startsWith('/')) {

@@ -107,7 +107,8 @@ $user = $data['nguoi_dung'];
         let cleanUrl = dbUrl.replace(/\\\//g, '/');
         
         // Loại bỏ "ecom_clothes_web/" nếu có ở đầu
-        cleanUrl = cleanUrl.replace(/^ecom_clothes_web\//i, '');
+        cleanUrl = cleanUrl.replace(/^https?:\/\/localhost(\/ecom_clothes_web)?\//i, '')
+                           .replace(/^ecom_clothes_web\//i, '');
         
         // Đảm bảo có dấu / ở đầu
         if (!cleanUrl.startsWith('/')) {

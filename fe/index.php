@@ -18,7 +18,10 @@ function normalizeImagePath($path) {
     
     $path = trim($path);
     
-    // 1. Nếu đã là URL đầy đủ (http/https), giữ nguyên
+    // 1. Loại bỏ prefix localhost nếu còn sót trong database
+    $path = preg_replace('#^https?://localhost(/ecom_clothes_web)?#i', '', $path);
+
+    // Nếu là URL ngoài (http/https), giữ nguyên
     if (strpos($path, 'http://') === 0 || strpos($path, 'https://') === 0) {
         return $path;
     }

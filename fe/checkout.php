@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 session_set_cookie_params([
   'lifetime' => 0,
-  'path' => '/ecom_clothes_web',
+  'path' => '/',
   'httponly' => true,
   'samesite' => 'Lax',
 ]);

@@ -1,13 +1,13 @@
 <?php
 // --- GIỮ NGUYÊN ĐƯỜNG DẪN GỐC ---
-$base_url = '/ecom_clothes_web/fe/'; 
+$base_url = '/';
 // -------------------------
 
 // 1. Khởi tạo Session (Giữ nguyên)
 if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params([
         'lifetime' => 0,
-        'path' => '/ecom_clothes_web',
+        'path' => '/',
         'httponly' => true,
         'samesite' => 'Lax',
     ]);

@@ -4,7 +4,7 @@ declare(strict_types=1);
 // Đồng bộ cookie path giống FE + BE
 session_set_cookie_params([
   'lifetime' => 0,
-  'path' => '/ecom_clothes_web',
+  'path' => '/',
   'httponly' => true,
   'samesite' => 'Lax',
 ]);
@@ -39,7 +39,7 @@ session_start();
 $_SESSION = [];
 
 if (ini_get("session.use_cookies")) {
-  setcookie($cookieName, '', time() - 42000, '/ecom_clothes_web');
+  setcookie($cookieName, '', time() - 42000, '/');
 }
 session_destroy();
 

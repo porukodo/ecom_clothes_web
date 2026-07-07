@@ -217,17 +217,15 @@ include 'header.php';
         u = u.replace(/^ecom_clothes_web\//i, '');
         u = u.replace(/^PTUD\//i, '');
         
-        // Tạo full URL
-        const base = window.location.origin; // "http://localhost"
-        const projectPath = '/ecom_clothes_web'; // Đường dẫn project trong localhost
-        
+        // Loại bỏ prefix localhost nếu còn sót trong database
+        u = u.replace(/^https?:\/\/localhost(\/ecom_clothes_web)?/i, '');
+
         // Đảm bảo đường dẫn bắt đầu với /
         if(!u.startsWith('/')) {
             u = '/' + u;
         }
-        
-        // Kết hợp: http://localhost + /ecom_clothes_web + /images/...
-        return base + projectPath + u;
+
+        return u;
     }
 
     

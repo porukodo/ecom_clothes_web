@@ -2,6 +2,9 @@
 // Database import script for Railway deployment
 require_once __DIR__ . '/fe/db.php';
 
+echo "DEBUG: db_host = {$db_host}\n";
+echo "DEBUG: db_user = {$db_user}\n";
+echo "DEBUG: db_name = {$db_name}\n";
 echo "Connecting to: {$db_host}:{$db_port}...\n";
 $conn = new mysqli($db_host, $db_user, $db_pass, 'mysql', $db_port);
 

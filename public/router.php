@@ -3,8 +3,14 @@
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-// Serve existing static files directly (css, js, images, etc.)
+// Serve existing static files from public/ directly
 if ($uri !== '/' && file_exists(__DIR__ . $uri)) {
+    return false;
+}
+
+// Serve images/ and other assets from project root
+$project_file = __DIR__ . '/..' . $uri;
+if ($uri !== '/' && file_exists($project_file) && !is_dir($project_file)) {
     return false;
 }
 

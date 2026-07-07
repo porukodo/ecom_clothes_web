@@ -5,20 +5,6 @@ $conn = db_connect($db_host, $db_user, $db_pass, $db_name, $db_port);
 $old = 'http://localhost/ecom_clothes_web';
 $new = '';
 
-$tables = [
-    ['anh_san_pham', 'url_anh'],
-    ['san_pham', 'anh_chinh'],
-    ['banner', 'url_anh'],
-];
-
-foreach ($tables as [$table, $col]) {
-    $result = $conn->query("SHOW TABLES LIKE '{$table}'");
-    if ($result->num_rows === 0) continue;
-
-    $sql = "UPDATE `{$table}` SET `{$col}` = REPLACE(`{$col}`, '{$old}', '{$new}') WHERE `{$col}` LIKE '%localhost%'";
-    $conn->query($sql);
-    echo "✓ Fixed {$table}.{$col}: {$conn->affected_rows} rows updated\n";
-}
 
 // Also check all tables dynamically
 $result = $conn->query("SHOW TABLES");

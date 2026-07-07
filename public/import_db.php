@@ -15,6 +15,8 @@ echo "✓ Connected\n";
 $conn->query("CREATE DATABASE IF NOT EXISTS `{$db_name}`");
 $conn->select_db($db_name);
 $conn->set_charset('utf8mb4');
+$conn->query("SET FOREIGN_KEY_CHECKS=0");
+$conn->query("SET SQL_MODE='NO_AUTO_VALUE_ON_ZERO'");
 
 echo "Reading SQL file...\n";
 $lines = file(__DIR__ . '/../database.sql', FILE_IGNORE_NEW_LINES);
@@ -74,5 +76,6 @@ if (!empty($errors)) {
     }
 }
 
+$conn->query("SET FOREIGN_KEY_CHECKS=1");
 $conn->close();
 echo "Finished!\n";

@@ -186,7 +186,7 @@ async function loadProducts(){
   const trang = Number(qs('trang') || 1);
   const gioi_han = Number(qs('gioi_han') || 12); // grid 4 cột -> 12 đẹp
   const kich_co_id = qs('kich_co_id');
-  const url = new URL(`${API_BASE}/api/san-pham`);
+  const url = new URL(`${API_BASE}/api/san-pham`, window.location.origin);
   url.searchParams.set('trang', String(trang));
   url.searchParams.set('gioi_han', String(gioi_han));
   if(tu_khoa) url.searchParams.set('tu_khoa', tu_khoa);

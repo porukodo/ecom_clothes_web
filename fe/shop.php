@@ -456,7 +456,7 @@ async function loadProducts(){
   const gia_den = qs('gia_den');
   const sap_xep = qs('sap_xep');
 
-  const url = new URL(`${API_BASE}/api/san-pham`);
+  const url = new URL(`${API_BASE}/api/san-pham`, window.location.origin);
   url.searchParams.set('trang', String(trang));
   url.searchParams.set('gioi_han', String(gioi_han));
 

@@ -50,60 +50,95 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        * { box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-color: #f0ede8;
+            background-image:
+                radial-gradient(circle at 20% 50%, rgba(180,160,130,0.15) 0%, transparent 60%),
+                radial-gradient(circle at 80% 20%, rgba(150,130,110,0.12) 0%, transparent 50%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
         }
         .login-card {
-            background: white;
-            border-radius: 1.5rem;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            background: #fff;
+            border-radius: 1rem;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
             overflow: hidden;
-            max-width: 440px;
+            max-width: 420px;
             width: 100%;
         }
         .login-header {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            padding: 2.5rem 2rem;
+            background-color: #1a1a1a;
+            padding: 2.25rem 2rem;
             text-align: center;
         }
+        .login-header .brand-mark {
+            width: 44px; height: 44px;
+            background: #fff;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        .login-header .brand-mark i {
+            color: #1a1a1a;
+            font-size: 1.25rem;
+        }
         .form-control {
-            padding: 0.875rem 1rem;
-            border-radius: 0.75rem;
-            border: 1px solid #e5e7eb;
+            padding: 0.8rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #ddd;
+            font-size: 0.925rem;
+            transition: border-color 0.2s;
         }
         .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            border-color: #1a1a1a;
+            box-shadow: 0 0 0 3px rgba(26,26,26,0.08);
+        }
+        .input-group-text {
+            border-radius: 0.5rem 0 0 0.5rem !important;
+            background: #f7f7f7;
+            border-color: #ddd;
+        }
+        .input-group .form-control {
+            border-radius: 0 0.5rem 0.5rem 0 !important;
         }
         .btn-login {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 0.875rem;
-            border-radius: 0.75rem;
+            background: #1a1a1a;
+            color: #fff;
+            padding: 0.825rem;
+            border-radius: 0.5rem;
             font-weight: 600;
+            font-size: 0.95rem;
             border: none;
-            transition: transform 0.2s;
+            letter-spacing: 0.01em;
+            transition: background 0.2s, transform 0.15s;
         }
         .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            background: #333;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+        .form-body {
+            padding: 2rem;
         }
     </style>
 </head>
 <body>
     <div class="login-card">
         <div class="login-header">
-            <i class="fas fa-user-shield fa-3x text-white mb-3"></i>
-            <h3 class="text-white fw-bold mb-1">Admin Login</h3>
-            <p class="text-white-50 small mb-0">Đăng nhập vào hệ thống quản trị</p>
+            <div class="brand-mark">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h4 class="text-white fw-semibold mb-1" style="letter-spacing:-0.01em">Admin</h4>
+            <p class="mb-0" style="color:rgba(255,255,255,0.45);font-size:0.8rem">Hệ thống quản trị nội bộ</p>
         </div>
-        
-        <div class="p-4">
+
+        <div class="form-body">
             <?php if ($error): ?>
                 <div class="alert alert-danger alert-dismissible fade show rounded-3" role="alert">
                     <i class="fas fa-exclamation-circle me-2"></i><?php echo $error; ?>
@@ -138,7 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <i class="fas fa-sign-in-alt me-2"></i>Đăng nhập
                 </button>
             </form>
-        </div>
+        </div><!-- /form-body -->
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

@@ -60,7 +60,9 @@ final class EncryptionService
             }
 
             if (!KeyManager::isEnabled()) {
-                throw new RuntimeException('Cannot decrypt PII: ENCRYPTION_ENABLED is false');
+                // Graceful fallback: return empty string for encrypted fields when keys are unavailable
+                // (admin can still access the dashboard, just without seeing encrypted PII)
+                return '';
             }
 
             $raw = base64_decode(substr($stored, strlen(self::VERSION_PREFIX)), true);

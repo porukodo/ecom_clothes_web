@@ -231,37 +231,62 @@ include 'includes/header.php';
 }
 
 /* --- Chart Layout --- */
-.chart-wrapper {
-    position: relative;
-    padding-left: 60px;
-    padding-right: 10px;
+.chart-outer {
+    display: flex;
+    height: 300px;
+    gap: 0;
 }
+/* Fixed Y-axis column */
 .y-axis {
-    position: absolute;
-    top: 0; left: 0; bottom: 30px;
-    width: 60px;
+    flex: 0 0 56px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    padding-bottom: 30px; /* matches x-label height */
     pointer-events: none;
-    z-index: 1;
 }
 .y-axis-label {
     font-size: 10px;
     color: #94a3b8;
     text-align: right;
-    padding-right: 10px;
+    padding-right: 8px;
     transform: translateY(50%);
+    white-space: nowrap;
 }
 .y-axis-label:first-child { transform: translateY(0); }
-.y-axis-label:last-child { transform: translateY(100%); }
+.y-axis-label:last-child  { transform: translateY(100%); }
 
-.grid-lines {
+/* Scrollable bars area */
+.chart-scroll {
+    flex: 1 1 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    position: relative;
+    /* hide scrollbar on non-touch but still scrollable */
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+.chart-scroll::-webkit-scrollbar { height: 4px; }
+.chart-scroll::-webkit-scrollbar-track { background: transparent; }
+.chart-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+
+.chart-inner {
+    display: flex;
+    align-items: flex-end;
+    height: calc(100% - 30px); /* leave room for x-labels */
+    position: relative;
+    min-width: 100%;           /* expand for many bars */
+    gap: 6px;
+    padding: 0 4px;
+}
+/* Horizontal grid drawn as a background pseudo-element via inline style */
+.chart-grid {
     position: absolute;
-    top: 0; left: 60px; right: 0; bottom: 30px;
+    inset: 0;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    pointer-events: none;
     z-index: 0;
 }
 .grid-line {
@@ -269,17 +294,61 @@ include 'includes/header.php';
     border-bottom: 1px dashed #e2e8f0;
     height: 0;
 }
-.grid-line:last-child { border-bottom: 1px solid #cbd5e1; }
+.grid-line:last-child { border-bottom: 1px solid #e2e8f0; }
 
-.bars-container {
-    position: relative;
-    z-index: 2;
-    height: 100%;
+/* X-label row */
+.chart-xlabels {
+    display: flex;
+    gap: 6px;
+    padding: 0 4px;
+    height: 30px;
+    min-width: 100%;
+    align-items: center;
+}
+.chart-xlabel {
+    font-size: 10px;
+    color: #94a3b8;
+    text-align: center;
+    flex-shrink: 0;
 }
 
-.chart-bar { background: linear-gradient(180deg, #6366f1 0%, #a5b4fc 100%); border-radius: 6px 6px 0 0; transition: height 0.6s ease; cursor: pointer; min-height: 4px; }
-.chart-bar:hover { opacity: 0.85; }
-.chart-tooltip { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #1e293b; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; white-space: nowrap; opacity: 0; transition: opacity 0.2s; margin-bottom: 6px; pointer-events: none; z-index: 10; }
+/* Bar */
+.chart-bar-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+}
+.chart-bar {
+    background: #4a7c6f;
+    border-radius: 4px 4px 0 0;
+    transition: background 0.15s;
+    cursor: pointer;
+    min-height: 4px;
+    position: relative;
+    width: 100%;
+}
+.chart-bar:hover { background: #3a6259; }
+.chart-tooltip {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e293b;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.15s;
+    pointer-events: none;
+    z-index: 10;
+}
 .chart-bar:hover .chart-tooltip { opacity: 1; }
 
 /* --- Helpers --- */
@@ -506,7 +575,15 @@ include 'includes/header.php';
                                 }
                             ?>
 
-                            <div class="chart-wrapper" style="height: 300px;">
+                            <?php
+                                // Bar width: fixed 28px each + 6px gap
+                                $bar_w   = 28;
+                                $n_bars  = count($revenue_by_day);
+                                // Total scroll width: n*bar + (n-1)*gap + padding
+                                $scroll_min_w = $n_bars * $bar_w + max(0, $n_bars - 1) * 6 + 8;
+                            ?>
+                            <div class="chart-outer">
+                                <!-- Fixed Y-axis -->
                                 <div class="y-axis">
                                     <div class="y-axis-label"><?php echo formatPrice($max_revenue); ?></div>
                                     <div class="y-axis-label"><?php echo formatPrice($max_revenue * 0.75); ?></div>
@@ -514,32 +591,39 @@ include 'includes/header.php';
                                     <div class="y-axis-label"><?php echo formatPrice($max_revenue * 0.25); ?></div>
                                     <div class="y-axis-label">0đ</div>
                                 </div>
-                                <div class="grid-lines">
-                                    <div class="grid-line"></div>
-                                    <div class="grid-line"></div>
-                                    <div class="grid-line"></div>
-                                    <div class="grid-line"></div>
-                                    <div class="grid-line"></div>
-                                </div>
-                                <div class="bars-container d-flex align-items-end justify-content-between gap-2">
-                                    <?php foreach ($revenue_by_day as $day): 
-                                        $height = ($day['doanh_thu'] / $max_revenue) * 100;
-                                    ?>
-                                    <div class="d-flex flex-column align-items-center flex-fill" style="height: 100%;">
-                                        <div class="w-100 d-flex align-items-end justify-content-center flex-grow-1">
-                                            <div class="chart-bar position-relative w-100" style="height: <?php echo $height; ?>%; max-width: 40px;">
+
+                                <!-- Scrollable bars + x-labels -->
+                                <div class="chart-scroll" id="chartScroll">
+                                    <!-- Bars -->
+                                    <div class="chart-inner" style="min-width: <?php echo $scroll_min_w; ?>px;">
+                                        <div class="chart-grid">
+                                            <div class="grid-line"></div>
+                                            <div class="grid-line"></div>
+                                            <div class="grid-line"></div>
+                                            <div class="grid-line"></div>
+                                            <div class="grid-line"></div>
+                                        </div>
+                                        <?php foreach ($revenue_by_day as $day):
+                                            $height = ($day['doanh_thu'] / $max_revenue) * 100;
+                                        ?>
+                                        <div class="chart-bar-col" style="width: <?php echo $bar_w; ?>px;">
+                                            <div class="chart-bar" style="height: <?php echo $height; ?>%;">
                                                 <div class="chart-tooltip">
-                                                    <?php echo formatPrice($day['doanh_thu']); ?>
-                                                    <br>
-                                                    <span class="fw-light"><?php echo date('d/m', strtotime($day['ngay'])); ?></span>
+                                                    <?php echo formatPrice($day['doanh_thu']); ?><br>
+                                                    <span style="opacity:.7"><?php echo date('d/m', strtotime($day['ngay'])); ?></span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="text-xs text-secondary fw-medium d-flex align-items-center justify-content-center" style="height: 30px;">
-                                            <?php echo date('d/m', strtotime($day['ngay'])); ?>
-                                        </div>
+                                        <?php endforeach; ?>
                                     </div>
-                                    <?php endforeach; ?>
+                                    <!-- X-labels (same scroll container, same min-width) -->
+                                    <div class="chart-xlabels" style="min-width: <?php echo $scroll_min_w; ?>px;">
+                                        <?php foreach ($revenue_by_day as $day): ?>
+                                        <div class="chart-xlabel" style="width: <?php echo $bar_w; ?>px;">
+                                            <?php echo date('d', strtotime($day['ngay'])); ?>
+                                        </div>
+                                        <?php endforeach; ?>
+                                    </div>
                                 </div>
                             </div>
                         <?php endif; ?>

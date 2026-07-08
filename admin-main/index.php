@@ -142,10 +142,10 @@ $top_products = $stmt->fetchAll();
 
 $revenue_by_day = [];
 if ($period === 'month') {
-    // Chỉ tính đơn hoàn tất cho biểu đồ
-    $stmt = $pdo->prepare("SELECT DATE(tao_luc) as ngay, COALESCE(SUM(tong_tien), 0) as doanh_thu FROM don_hang WHERE YEAR(tao_luc) = ? AND MONTH(tao_luc) = ? AND trang_thai = 'HOAN_TAT' GROUP BY DATE(tao_luc) ORDER BY ngay DESC LIMIT 7");
+    // Fetch all days with orders in the selected month
+    $stmt = $pdo->prepare("SELECT DATE(tao_luc) as ngay, COALESCE(SUM(tong_tien), 0) as doanh_thu FROM don_hang WHERE YEAR(tao_luc) = ? AND MONTH(tao_luc) = ? AND trang_thai = 'HOAN_TAT' GROUP BY DATE(tao_luc) ORDER BY ngay ASC");
     $stmt->execute([$year, $month]);
-    $revenue_by_day = array_reverse($stmt->fetchAll());
+    $revenue_by_day = $stmt->fetchAll();
 }
 
 function getProductImageUrl($dbPath) {
@@ -480,7 +480,7 @@ include 'includes/header.php';
                 <div class="card card-modern shadow-sm h-100">
                     <div class="card-body p-4">
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h5 class="fw-bold mb-0">Biểu đồ doanh thu 7 ngày qua</h5>
+                            <h5 class="fw-bold mb-0">Biểu đồ doanh thu — <?php echo $period_label; ?></h5>
                         </div>
                         <?php if (empty($revenue_by_day)): ?>
                             <div class="text-center py-5 text-muted">
